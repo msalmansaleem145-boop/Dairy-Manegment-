@@ -1,0 +1,6 @@
+{
+  "name": "ASK Dairy Management",
+  "description": "Professional Dairy Farm ERP, POS, Breeding, Milk Production & Double-Entry Accounting Platform",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
