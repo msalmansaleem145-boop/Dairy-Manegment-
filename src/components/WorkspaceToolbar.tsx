@@ -59,7 +59,7 @@ export const WorkspaceToolbar: React.FC<WorkspaceToolbarProps> = ({
   const t = translations[lang];
 
   return (
-    <div className="bg-neutral-900 text-neutral-200 border-b border-neutral-800 px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs">
+    <div className="bg-[#123D2B] text-neutral-100 border-b border-[#0E2B1E] px-4 sm:px-6 py-2.5 flex flex-wrap items-center justify-between gap-3 text-xs shadow-xs">
       {/* Left: Mobile Menu Toggle & Branch & Role */}
       <div className="flex items-center flex-wrap gap-3">
         <button

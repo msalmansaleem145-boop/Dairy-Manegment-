@@ -1,4 +1,5 @@
 import React from 'react';
+import { AskLogo } from './AskLogo';
 import {
   LayoutDashboard,
   Milk,
@@ -132,8 +133,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const sidebarContent = (
     <div className="flex flex-col h-full bg-white border-r border-neutral-200 w-64 select-none">
       {/* Brand title inside drawer for mobile */}
-      <div className="p-4 border-b border-neutral-100 flex items-center justify-between lg:hidden">
-        <span className="font-bold text-neutral-900 text-sm tracking-tight">ASK Dairy Management</span>
+      <div className="p-3.5 border-b border-neutral-100 flex items-center justify-between lg:hidden bg-[#123D2B]/5">
+        <AskLogo variant="horizontal" size="xs" />
         <button
           onClick={onCloseMobile}
           className="p-1 text-neutral-500 hover:text-neutral-800 rounded-md"

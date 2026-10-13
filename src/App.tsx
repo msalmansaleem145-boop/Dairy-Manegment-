@@ -8,6 +8,7 @@ import { Sidebar } from './components/Sidebar';
 import { ReceiptModal } from './components/ReceiptModal';
 import { NotificationCenter } from './components/NotificationCenter';
 import { QuickActionModal } from './components/QuickActionModal';
+import { BrandedStartupScreen } from './components/BrandedStartupScreen';
 
 // Views
 import { DashboardView } from './views/DashboardView';
@@ -33,6 +34,7 @@ export default function App() {
   const [isOffline, setIsOffline] = useState<boolean>(false);
   const [pendingQueueCount, setPendingQueueCount] = useState<number>(0);
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState<boolean>(false);
+  const [isStartupLoading, setIsStartupLoading] = useState<boolean>(true);
   
   // Modals
   const [showNotifications, setShowNotifications] = useState<boolean>(false);
@@ -249,6 +251,14 @@ export default function App() {
           setShowQuickAction(false);
         }}
       />
+
+      {/* Branded Startup Loading Screen (Appears only on initial application startup) */}
+      {isStartupLoading && (
+        <BrandedStartupScreen
+          onComplete={() => setIsStartupLoading(false)}
+          minDurationMs={1500}
+        />
+      )}
     </div>
   );
 }

@@ -1,4 +1,5 @@
 import React from 'react';
+import { AskLogo } from './AskLogo';
 
 interface HeaderProps {
   currentTab: string;
@@ -12,7 +13,7 @@ export const Header: React.FC<HeaderProps> = ({
   onOpenQuickAction
 }) => {
   return (
-    <header className="flex items-center justify-between gap-8 px-6 py-3.5 bg-white border-b border-neutral-200 sticky top-0 z-40">
+    <header className="flex items-center justify-between gap-8 px-6 py-3 bg-white border-b border-neutral-200 sticky top-0 z-40 shadow-xs">
       {/* Zone 1: Brand title, single element, no nested pills or taglines */}
       <a
         href="#"
@@ -20,12 +21,10 @@ export const Header: React.FC<HeaderProps> = ({
           e.preventDefault();
           onNavigate('dashboard');
         }}
-        className="text-lg font-bold tracking-tight text-neutral-900 whitespace-nowrap shrink-0 flex items-center gap-2.5"
+        className="shrink-0 focus:outline-none"
+        aria-label="ASK Dairy Management Home"
       >
-        <span className="w-8 h-8 rounded-lg bg-emerald-800 text-white flex items-center justify-center font-bold text-sm tracking-wider">
-          ASK
-        </span>
-        <span>ASK Dairy Management</span>
+        <AskLogo variant="horizontal" size="sm" />
       </a>
 
       {/* Zone 2: 4-5 clean single-line text navigation links */}

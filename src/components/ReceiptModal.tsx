@@ -1,6 +1,7 @@
 import React from 'react';
 import { Printer, X } from 'lucide-react';
 import { Sale } from '../types';
+import { AskLogo } from './AskLogo';
 
 interface ReceiptModalProps {
   sale: Sale | null;
@@ -33,10 +34,11 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({ sale, onClose }) => 
         {/* Printable Receipt Content */}
         <div className="p-6 overflow-y-auto font-mono text-xs text-neutral-900" id="thermal-receipt-printable">
           {/* Farm Header */}
-          <div className="text-center pb-3 border-b border-dashed border-neutral-400">
+          <div className="text-center pb-3 border-b border-dashed border-neutral-400 flex flex-col items-center">
+            <AskLogo variant="mark" size="sm" className="mb-1.5" />
             <h1 className="text-sm font-bold tracking-wider">ASK DAIRY MANAGEMENT</h1>
-            <p className="text-[10px] text-neutral-600">Pure Farm Fresh Milk & Dairy Products</p>
-            <p className="text-[10px] text-neutral-600">Okara Bypass / Gujranwala · Punjab, PK</p>
+            <p className="text-[10px] text-neutral-600">Pure Farm Fresh Milk &amp; Dairy Products</p>
+            <p className="text-[10px] text-neutral-600">Okara Bypass / Gujranwala &middot; Punjab, PK</p>
             <p className="text-[10px] text-neutral-600">Helpline: +92 300 4567890</p>
           </div>
 

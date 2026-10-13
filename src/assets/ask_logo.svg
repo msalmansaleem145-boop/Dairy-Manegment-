@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="100%" height="100%">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="forestShieldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#123D2B" />
+      <stop offset="50%" stop-color="#0E2B1E" />
+      <stop offset="100%" stop-color="#17221D" />
+    </linearGradient>
+
+    <linearGradient id="champagneGoldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#E5C77E" />
+      <stop offset="50%" stop-color="#C7A45D" />
+      <stop offset="100%" stop-color="#9E7B35" />
+    </linearGradient>
+
+    <linearGradient id="emeraldRibbonGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2EC480" />
+      <stop offset="50%" stop-color="#1F8A5B" />
+      <stop offset="100%" stop-color="#125939" />
+    </linearGradient>
+
+    <linearGradient id="milkDropGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#FFFFFF" />
+      <stop offset="70%" stop-color="#F7F5EF" />
+      <stop offset="100%" stop-color="#D8D3C3" />
+    </linearGradient>
+
+    <filter id="subtleGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.35" />
+    </filter>
+  </defs>
+
+  <!-- Outer Circular Gold Laurel Ring -->
+  <circle cx="200" cy="200" r="186" fill="none" stroke="url(#champagneGoldGrad)" stroke-width="3.5" opacity="0.85" />
+  <circle cx="200" cy="200" r="178" fill="none" stroke="#C7A45D" stroke-width="1" stroke-dasharray="4,4" opacity="0.6" />
+
+  <!-- Shield Body -->
+  <path d="M 200,32 
+           C 285,32 356,88 356,176 
+           C 356,268 280,332 200,366 
+           C 120,332 44,268 44,176 
+           C 44,88 115,32 200,32 Z" 
+        fill="url(#forestShieldGrad)" 
+        stroke="url(#champagneGoldGrad)" 
+        stroke-width="5" 
+        filter="url(#subtleGlow)" />
+
+  <!-- Inner Architectural Crest Border -->
+  <path d="M 200,44 
+           C 276,44 340,94 340,174 
+           C 340,256 270,316 200,348 
+           C 130,316 60,256 60,174 
+           C 60,94 124,44 200,44 Z" 
+        fill="none" 
+        stroke="#1F8A5B" 
+        stroke-width="2" 
+        opacity="0.7" />
+
+  <!-- Geometric ASK Monogram Lockup -->
+  <!-- Letter A (Outer Triangle & Peak with Gold Crossbar) -->
+  <path d="M 200,72 L 272,216 L 246,216 L 200,122 L 154,216 L 128,216 Z" 
+        fill="url(#champagneGoldGrad)" />
+
+  <!-- Stylized Milk Drop Inside the Apex of 'A' -->
+  <path d="M 200,110 
+           C 200,110 216,134 216,150 
+           C 216,159 209,166 200,166 
+           C 191,166 184,159 184,150 
+           C 184,134 200,110 200,110 Z" 
+        fill="url(#milkDropGrad)" 
+        filter="url(#subtleGlow)" />
+
+  <!-- Letter S (Flowing Pasture Curve & Milk Ribbon) -->
+  <path d="M 226,174 
+           C 218,168 206,166 195,166 
+           C 176,166 164,175 164,188 
+           C 164,204 180,210 202,216 
+           C 228,223 244,233 244,254 
+           C 244,278 222,294 192,294 
+           C 172,294 154,286 142,274 
+           L 156,256 
+           C 166,268 180,274 194,274 
+           C 208,274 218,266 218,255 
+           C 218,241 202,235 182,229 
+           C 158,222 140,212 140,189 
+           C 140,166 160,150 193,150 
+           C 210,150 224,156 236,164 Z" 
+        fill="url(#emeraldRibbonGrad)" />
+
+  <!-- Letter K (Right Branching Arm & Stem) -->
+  <!-- K Stem integrated into A's right leg, K diagonal arms in Gold & Ivory -->
+  <path d="M 252,176 L 274,176 L 236,228 L 278,288 L 254,288 L 222,242 L 238,220 Z" 
+        fill="url(#champagneGoldGrad)" />
+
+  <!-- Dairy Cow Silhouette at Bottom of Shield -->
+  <g transform="translate(142, 276) scale(0.29)" fill="#F7F5EF" opacity="0.95">
+    <path d="M 120,40 
+             C 126,38 136,36 148,34 
+             C 156,33 162,35 168,40 
+             C 174,38 180,38 186,41 
+             C 192,45 194,52 195,60 
+             C 200,64 210,74 216,84 
+             C 220,90 220,100 216,106 
+             C 212,112 204,112 198,110 
+             L 194,124 
+             C 192,132 186,134 180,132 
+             L 174,106 
+             C 164,108 152,110 140,110 
+             C 128,114 116,118 102,118 
+             L 96,152 
+             C 94,158 88,160 82,158 
+             L 80,120 
+             C 74,120 68,116 64,110 
+             L 54,152 
+             C 52,158 46,160 40,158 
+             L 42,108 
+             C 36,106 32,98 32,90 
+             C 32,80 38,72 48,68 
+             C 58,64 74,60 90,56 
+             C 102,52 112,44 120,40 Z" />
+  </g>
+
+  <!-- Stars of Quality Accent -->
+  <polygon points="120,68 123,76 131,76 125,81 127,89 120,84 113,89 115,81 109,76 117,76" fill="#C7A45D" />
+  <polygon points="200,52 203,60 211,60 205,65 207,73 200,68 193,73 195,65 189,60 197,60" fill="#E5C77E" />
+  <polygon points="280,68 283,76 291,76 285,81 287,89 280,84 273,89 275,81 269,76 277,76" fill="#C7A45D" />
+
+  <!-- Bottom Ribbon Banner Trim with Est. 2024 -->
+  <path d="M 148,328 Q 200,344 252,328" fill="none" stroke="url(#champagneGoldGrad)" stroke-width="2" />
+  <circle cx="200" cy="336" r="3.5" fill="#E5C77E" />
+</svg>

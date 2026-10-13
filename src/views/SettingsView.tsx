@@ -9,8 +9,9 @@ import {
   AlertTriangle,
   Save
 } from 'lucide-react';
-import { AppDatabase, DairyDatabaseService, LOGO_URL } from '../services/storage';
+import { AppDatabase, DairyDatabaseService } from '../services/storage';
 import { Language, translations } from '../i18n/translations';
+import { AskLogo } from '../components/AskLogo';
 
 interface SettingsViewProps {
   db: AppDatabase;
@@ -104,13 +105,8 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
       {/* Brand & Farm Identity */}
       <div className="bg-white rounded-xl border border-neutral-200 p-6 space-y-5 shadow-xs">
         <div className="flex items-center gap-4 border-b border-neutral-200 pb-4">
-          <div className="w-16 h-16 rounded-xl overflow-hidden border border-neutral-200 shrink-0 bg-neutral-100 flex items-center justify-center">
-            <img
-              src={LOGO_URL}
-              alt="ASK Dairy Logo"
-              referrerPolicy="no-referrer"
-              className="w-full h-full object-cover"
-            />
+          <div className="shrink-0">
+            <AskLogo variant="mark" size="lg" />
           </div>
           <div>
             <h2 className="text-sm font-bold text-neutral-900">ASK Dairy Management Enterprise</h2>
