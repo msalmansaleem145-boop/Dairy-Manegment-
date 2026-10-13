@@ -110,9 +110,12 @@ export const BrandedStartupScreen: React.FC<BrandedStartupScreenProps> = ({
         </button>
       </div>
 
-      {/* Bottom Subtle Trust Badge */}
-      <div className="absolute bottom-4 left-0 right-0 text-center text-[10px] text-white/40 tracking-wider uppercase font-medium">
-        Enterprise Livestock &middot; POS Counter &middot; Double-Entry Ledgers
+      {/* Bottom Subtle Developer Credit Badge */}
+      <div className="absolute bottom-4 left-0 right-0 text-center text-[11px] text-white/80 tracking-wide font-medium flex flex-wrap items-center justify-center gap-2 px-4">
+        <span className="text-amber-300 font-medium">Powered by:</span>
+        <span className="text-white font-bold">M Salman Saleem</span>
+        <span className="text-white/40">&bull;</span>
+        <span className="text-emerald-300 font-mono font-semibold">WhatsApp: +923029075029</span>
       </div>
     </div>
   );

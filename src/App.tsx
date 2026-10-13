@@ -9,6 +9,7 @@ import { ReceiptModal } from './components/ReceiptModal';
 import { NotificationCenter } from './components/NotificationCenter';
 import { QuickActionModal } from './components/QuickActionModal';
 import { BrandedStartupScreen } from './components/BrandedStartupScreen';
+import { Footer } from './components/Footer';
 
 // Views
 import { DashboardView } from './views/DashboardView';
@@ -105,9 +106,10 @@ export default function App() {
           onCloseMobile={() => setMobileSidebarOpen(false)}
         />
 
-        {/* View Container */}
-        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto">
-          {currentTab === 'dashboard' && (
+        {/* View Container & Footer Column */}
+        <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
+          <main className="flex-1 p-4 sm:p-6 lg:p-8">
+            {currentTab === 'dashboard' && (
             <DashboardView
               db={db}
               onNavigate={(tab) => setCurrentTab(tab)}
@@ -221,7 +223,11 @@ export default function App() {
               lang={lang}
             />
           )}
-        </main>
+          </main>
+
+          {/* Vibrant Colorful Footer with Powered by M Salman Saleem */}
+          <Footer lang={lang} />
+        </div>
       </div>
 
       {/* Thermal Receipt Print Modal */}
