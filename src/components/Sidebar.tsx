@@ -14,7 +14,11 @@ import {
   BarChart3,
   Settings,
   ShieldCheck,
-  X
+  Receipt,
+  X,
+  CreditCard,
+  Layers,
+  ChevronRight
 } from 'lucide-react';
 import { UserRole } from '../types';
 import { Language, translations } from '../i18n/translations';
@@ -28,91 +32,115 @@ interface SidebarProps {
   onCloseMobile: () => void;
 }
 
-interface NavItem {
-  id: string;
-  labelKey: keyof typeof translations.en;
-  icon: React.ComponentType<{ className?: string }>;
-  allowedRoles: UserRole[];
+interface NavSection {
+  title: { en: string; ur: string };
+  items: {
+    id: string;
+    label: { en: string; ur: string };
+    icon: React.ComponentType<{ className?: string }>;
+    allowedRoles: UserRole[];
+    badge?: string;
+    badgeColor?: string;
+  }[];
 }
 
-const navItems: NavItem[] = [
+const navSections: NavSection[] = [
   {
-    id: 'dashboard',
-    labelKey: 'dashboard',
-    icon: LayoutDashboard,
-    allowedRoles: ['super_admin', 'farm_owner', 'farm_manager', 'accountant', 'milk_operator', 'pos_operator', 'veterinarian', 'inventory_manager']
+    title: { en: 'LIVESTOCK & MILK', ur: 'مویشی اور دودھ' },
+    items: [
+      {
+        id: 'dashboard',
+        label: { en: 'Dashboard', ur: 'ڈیش بورڈ' },
+        icon: LayoutDashboard,
+        allowedRoles: ['super_admin', 'farm_owner', 'farm_manager', 'accountant', 'milk_operator', 'pos_operator', 'veterinarian', 'inventory_manager']
+      },
+      {
+        id: 'animals',
+        label: { en: 'Animal Management', ur: 'جانوروں کا انتظام' },
+        icon: ShieldCheck,
+        allowedRoles: ['super_admin', 'farm_owner', 'farm_manager', 'milk_operator', 'veterinarian'],
+        badge: '14 Head'
+      },
+      {
+        id: 'milkProduction',
+        label: { en: 'Milk Collection', ur: 'دودھ کا اندراج' },
+        icon: Milk,
+        allowedRoles: ['super_admin', 'farm_owner', 'farm_manager', 'milk_operator'],
+        badge: 'Shift'
+      },
+      {
+        id: 'reconciliation',
+        label: { en: 'Milk Reports & Chiller', ur: 'چیلر اور ریکونسیلیشن' },
+        icon: Scale,
+        allowedRoles: ['super_admin', 'farm_owner', 'farm_manager', 'milk_operator', 'accountant']
+      }
+    ]
   },
   {
-    id: 'animals',
-    labelKey: 'animals',
-    icon: ShieldCheck,
-    allowedRoles: ['super_admin', 'farm_owner', 'farm_manager', 'milk_operator', 'veterinarian']
+    title: { en: 'COMMERCE & POS', ur: 'سیلز اور کسٹمرز' },
+    items: [
+      {
+        id: 'posBilling',
+        label: { en: 'Point of Sale (POS)', ur: 'پی او ایس بلنگ' },
+        icon: ShoppingBag,
+        allowedRoles: ['super_admin', 'farm_owner', 'farm_manager', 'pos_operator', 'accountant'],
+        badge: 'Active',
+        badgeColor: 'bg-emerald-100 text-emerald-800'
+      },
+      {
+        id: 'customers',
+        label: { en: 'Customers & Credit Ledger', ur: 'کسٹمر کھاتہ اور ادھار' },
+        icon: Users,
+        allowedRoles: ['super_admin', 'farm_owner', 'farm_manager', 'pos_operator', 'accountant']
+      },
+      {
+        id: 'inventoryFeed',
+        label: { en: 'Inventory & Stock', ur: 'اسٹاک اور فیڈ ونڈا' },
+        icon: Package,
+        allowedRoles: ['super_admin', 'farm_owner', 'farm_manager', 'inventory_manager', 'veterinarian']
+      },
+      {
+        id: 'processing',
+        label: { en: 'Dairy Value Addition', ur: 'دیسی گھی و کھویا' },
+        icon: FlaskConical,
+        allowedRoles: ['super_admin', 'farm_owner', 'farm_manager', 'inventory_manager']
+      }
+    ]
   },
   {
-    id: 'milkProduction',
-    labelKey: 'milkProduction',
-    icon: Milk,
-    allowedRoles: ['super_admin', 'farm_owner', 'farm_manager', 'milk_operator']
-  },
-  {
-    id: 'reconciliation',
-    labelKey: 'reconciliation',
-    icon: Scale,
-    allowedRoles: ['super_admin', 'farm_owner', 'farm_manager', 'milk_operator', 'accountant']
-  },
-  {
-    id: 'posBilling',
-    labelKey: 'posBilling',
-    icon: ShoppingBag,
-    allowedRoles: ['super_admin', 'farm_owner', 'farm_manager', 'pos_operator', 'accountant']
-  },
-  {
-    id: 'customers',
-    labelKey: 'customers',
-    icon: Users,
-    allowedRoles: ['super_admin', 'farm_owner', 'farm_manager', 'pos_operator', 'accountant']
-  },
-  {
-    id: 'processing',
-    labelKey: 'processing',
-    icon: FlaskConical,
-    allowedRoles: ['super_admin', 'farm_owner', 'farm_manager', 'inventory_manager']
-  },
-  {
-    id: 'inventoryFeed',
-    labelKey: 'inventoryFeed',
-    icon: Package,
-    allowedRoles: ['super_admin', 'farm_owner', 'farm_manager', 'inventory_manager', 'veterinarian']
-  },
-  {
-    id: 'vetBreeding',
-    labelKey: 'vetBreeding',
-    icon: HeartPulse,
-    allowedRoles: ['super_admin', 'farm_owner', 'farm_manager', 'veterinarian']
-  },
-  {
-    id: 'accounting',
-    labelKey: 'accounting',
-    icon: BookOpen,
-    allowedRoles: ['super_admin', 'farm_owner', 'farm_manager', 'accountant']
-  },
-  {
-    id: 'employees',
-    labelKey: 'employees',
-    icon: UserCheck,
-    allowedRoles: ['super_admin', 'farm_owner', 'farm_manager', 'accountant']
-  },
-  {
-    id: 'reports',
-    labelKey: 'reports',
-    icon: BarChart3,
-    allowedRoles: ['super_admin', 'farm_owner', 'farm_manager', 'accountant', 'pos_operator']
-  },
-  {
-    id: 'settings',
-    labelKey: 'settings',
-    icon: Settings,
-    allowedRoles: ['super_admin', 'farm_owner', 'farm_manager']
+    title: { en: 'HEALTH & ACCOUNTING', ur: 'صحت اور مالیات' },
+    items: [
+      {
+        id: 'vetBreeding',
+        label: { en: 'Veterinary & Breeding', ur: 'ڈاکٹری معائنہ و افزائش' },
+        icon: HeartPulse,
+        allowedRoles: ['super_admin', 'farm_owner', 'farm_manager', 'veterinarian']
+      },
+      {
+        id: 'accounting',
+        label: { en: 'Purchases, Expenses & P&L', ur: 'کھاتہ جات اور اخراجات' },
+        icon: BookOpen,
+        allowedRoles: ['super_admin', 'farm_owner', 'farm_manager', 'accountant']
+      },
+      {
+        id: 'employees',
+        label: { en: 'Employees & Payroll', ur: 'ملازمین اور تنخواہیں' },
+        icon: UserCheck,
+        allowedRoles: ['super_admin', 'farm_owner', 'farm_manager', 'accountant']
+      },
+      {
+        id: 'reports',
+        label: { en: 'Reports & Analytics', ur: 'رپورٹس اور تجزیات' },
+        icon: BarChart3,
+        allowedRoles: ['super_admin', 'farm_owner', 'farm_manager', 'accountant', 'pos_operator']
+      },
+      {
+        id: 'settings',
+        label: { en: 'Settings', ur: 'ترتیبات' },
+        icon: Settings,
+        allowedRoles: ['super_admin', 'farm_owner', 'farm_manager']
+      }
+    ]
   }
 ];
 
@@ -124,58 +152,87 @@ export const Sidebar: React.FC<SidebarProps> = ({
   mobileOpen,
   onCloseMobile
 }) => {
-  const t = translations[lang];
-
-  const visibleItems = navItems.filter(item => 
-    item.allowedRoles.includes(userRole)
-  );
-
   const sidebarContent = (
-    <div className="flex flex-col h-full bg-white border-r border-neutral-200 w-64 select-none">
-      {/* Brand title inside drawer for mobile */}
-      <div className="p-3.5 border-b border-neutral-100 flex items-center justify-between lg:hidden bg-[#123D2B]/5">
+    <div className="flex flex-col h-full bg-white border-r border-neutral-200/80 w-64 sm:w-72 select-none">
+      
+      {/* Mobile Drawer Header */}
+      <div className="p-4 border-b border-neutral-100 flex items-center justify-between lg:hidden bg-[#14532D]/5">
         <AskLogo variant="horizontal" size="xs" />
         <button
           onClick={onCloseMobile}
-          className="p-1 text-neutral-500 hover:text-neutral-800 rounded-md"
+          className="p-1.5 text-neutral-500 hover:text-neutral-900 rounded-lg hover:bg-neutral-100 transition-colors"
+          aria-label="Close sidebar"
         >
           <X className="w-5 h-5" />
         </button>
       </div>
 
-      {/* Navigation Links */}
-      <div className="flex-1 py-3 px-3 space-y-1 overflow-y-auto">
-        <div className="px-3 py-1.5 text-[11px] font-semibold text-neutral-400 uppercase tracking-wider">
-          {lang === 'ur' ? 'ماڈیولز' : 'Modules'}
-        </div>
-        {visibleItems.map(item => {
-          const Icon = item.icon;
-          const isActive = currentTab === item.id;
+      {/* Navigation Sections */}
+      <div className="flex-1 py-4 px-3 space-y-6 overflow-y-auto">
+        {navSections.map((section, sIdx) => {
+          const visibleItems = section.items.filter(item => item.allowedRoles.includes(userRole));
+          if (visibleItems.length === 0) return null;
+
           return (
-            <button
-              key={item.id}
-              onClick={() => {
-                onSelectTab(item.id);
-                onCloseMobile();
-              }}
-              className={`w-full flex items-center gap-3 px-3 py-2 text-xs font-medium rounded-lg transition-colors text-left whitespace-nowrap cursor-pointer ${
-                isActive
-                  ? 'bg-emerald-50 text-emerald-900 font-semibold border border-emerald-200/60'
-                  : 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900'
-              }`}
-            >
-              <Icon className={`w-4 h-4 shrink-0 ${isActive ? 'text-emerald-700' : 'text-neutral-500'}`} />
-              <span className="truncate">{t[item.labelKey] as string}</span>
-            </button>
+            <div key={sIdx} className="space-y-1">
+              {/* Section Header */}
+              <div className="px-3 py-1 text-[10px] font-bold tracking-wider text-neutral-400 uppercase">
+                {lang === 'ur' ? section.title.ur : section.title.en}
+              </div>
+
+              {/* Section Items */}
+              {visibleItems.map(item => {
+                const Icon = item.icon;
+                const isActive = currentTab === item.id;
+
+                return (
+                  <button
+                    key={item.id}
+                    onClick={() => {
+                      onSelectTab(item.id);
+                      onCloseMobile();
+                    }}
+                    className={`w-full flex items-center justify-between px-3 py-2.5 text-xs font-semibold rounded-xl transition-all text-left cursor-pointer group ${
+                      isActive
+                        ? 'bg-gradient-to-r from-emerald-50 to-teal-50/60 text-emerald-950 border border-emerald-200/80 shadow-2xs font-bold'
+                        : 'text-neutral-600 hover:bg-neutral-50 hover:text-neutral-900 border border-transparent'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3 truncate">
+                      <div className={`p-1.5 rounded-lg transition-colors ${
+                        isActive 
+                          ? 'bg-emerald-600 text-white shadow-2xs' 
+                          : 'bg-neutral-100 text-neutral-500 group-hover:bg-neutral-200 group-hover:text-neutral-800'
+                      }`}>
+                        <Icon className="w-3.5 h-3.5 shrink-0" />
+                      </div>
+                      <span className="truncate">
+                        {lang === 'ur' ? item.label.ur : item.label.en}
+                      </span>
+                    </div>
+
+                    {item.badge && (
+                      <span className={`text-[10px] font-mono font-bold px-1.5 py-0.5 rounded-md shrink-0 ${
+                        item.badgeColor || (isActive ? 'bg-emerald-200/70 text-emerald-900' : 'bg-neutral-100 text-neutral-500')
+                      }`}>
+                        {item.badge}
+                      </span>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
           );
         })}
       </div>
 
-      {/* Footer Info */}
-      <div className="p-3 border-t border-neutral-100 text-[11px] text-neutral-400">
-        <div className="flex items-center justify-between">
-          <span>ASK ERP v2.4</span>
-          <span className="text-emerald-700 font-semibold">PKR (₨)</span>
+      {/* Sidebar Footer Info */}
+      <div className="p-3.5 border-t border-neutral-100 text-[11px] bg-neutral-50/60">
+        <div className="flex items-center justify-between text-neutral-500 font-mono">
+          <span className="font-semibold text-neutral-700">ASK ERP v2.4</span>
+          <span className="text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200/60">
+            PKR (₨)
+          </span>
         </div>
       </div>
     </div>
@@ -183,8 +240,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
   return (
     <>
-      {/* Desktop Sidebar */}
-      <aside className="hidden lg:block shrink-0 sticky top-14 h-[calc(100vh-3.5rem)] overflow-y-auto z-20">
+      {/* Desktop Sticky Sidebar */}
+      <aside className="hidden lg:block shrink-0 sticky top-16 h-[calc(100vh-4rem)] overflow-y-auto z-20">
         {sidebarContent}
       </aside>
 
@@ -192,10 +249,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
       {mobileOpen && (
         <div className="fixed inset-0 z-50 lg:hidden flex">
           <div
-            className="fixed inset-0 bg-neutral-900/60 transition-opacity"
+            className="fixed inset-0 bg-neutral-900/60 backdrop-blur-xs transition-opacity"
             onClick={onCloseMobile}
           />
-          <div className="relative z-10">
+          <div className="relative z-10 animate-in slide-in-from-left duration-200">
             {sidebarContent}
           </div>
         </div>

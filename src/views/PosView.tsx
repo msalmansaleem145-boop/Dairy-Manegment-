@@ -500,13 +500,13 @@ export const PosView: React.FC<PosViewProps> = ({
           <button
             onClick={handleCheckout}
             disabled={cartItems.length === 0}
-            className={`w-full py-3 rounded-lg text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-xs transition-colors ${
+            className={`w-full py-3.5 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 cursor-pointer shadow-sm transition-all transform hover:-translate-y-0.5 ${
               cartItems.length > 0
-                ? 'bg-emerald-800 hover:bg-emerald-900 text-white'
-                : 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
+                ? 'bg-gradient-to-r from-[#14532D] via-[#16A34A] to-[#14532D] hover:shadow-md text-white'
+                : 'bg-neutral-200 text-neutral-400 cursor-not-allowed transform-none'
             }`}
           >
-            <Printer className="w-4 h-4" />
+            <Printer className="w-4 h-4 text-emerald-200" />
             <span>Complete & Print Receipt (₨ {total.toLocaleString()})</span>
           </button>
         </div>

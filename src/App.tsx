@@ -8,6 +8,7 @@ import { Sidebar } from './components/Sidebar';
 import { ReceiptModal } from './components/ReceiptModal';
 import { NotificationCenter } from './components/NotificationCenter';
 import { QuickActionModal } from './components/QuickActionModal';
+import { GlobalSearchModal } from './components/GlobalSearchModal';
 import { BrandedStartupScreen } from './components/BrandedStartupScreen';
 import { Footer } from './components/Footer';
 
@@ -40,6 +41,7 @@ export default function App() {
   // Modals
   const [showNotifications, setShowNotifications] = useState<boolean>(false);
   const [showQuickAction, setShowQuickAction] = useState<boolean>(false);
+  const [showSearch, setShowSearch] = useState<boolean>(false);
   const [receiptSale, setReceiptSale] = useState<Sale | null>(null);
 
   const refreshDb = () => {
@@ -50,6 +52,18 @@ export default function App() {
 
   useEffect(() => {
     refreshDb();
+  }, []);
+
+  // Global Ctrl+K / Cmd+K listener for search
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setShowSearch(prev => !prev);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   const handleSyncOfflineQueue = () => {
@@ -68,15 +82,25 @@ export default function App() {
   const unreadNotificationsCount = db.notifications.filter(n => !n.read).length;
 
   return (
-    <div className={`min-h-screen flex flex-col bg-neutral-100 text-neutral-900 ${lang === 'ur' ? 'rtl' : 'ltr'}`} dir={lang === 'ur' ? 'rtl' : 'ltr'}>
-      {/* 1. Header (Adhering strictly to Top Bar 3-Zone Contract) */}
+    <div className={`min-h-screen flex flex-col bg-[#F5F7FA] text-neutral-900 ${lang === 'ur' ? 'rtl' : 'ltr'}`} dir={lang === 'ur' ? 'rtl' : 'ltr'}>
+      {/* 1. Header with Breadcrumbs, Global Search, User Profile, Notifications & Quick Actions */}
       <Header
         currentTab={currentTab}
         onNavigate={(tab) => setCurrentTab(tab)}
         onOpenQuickAction={() => setShowQuickAction(true)}
+        onOpenSearch={() => setShowSearch(true)}
+        onOpenNotifications={() => setShowNotifications(true)}
+        unreadNotificationsCount={unreadNotificationsCount}
+        branches={db.branches}
+        selectedBranchId={selectedBranchId}
+        onSelectBranch={(id) => setSelectedBranchId(id)}
+        currentRole={currentRole}
+        onChangeRole={(role) => setCurrentRole(role)}
+        lang={lang}
+        onToggleLang={(newLang) => setLang(newLang)}
       />
 
-      {/* 2. Workspace Control Toolbar */}
+      {/* 2. Workspace Control Toolbar (Branch, Role, Network, Sync & Drawer) */}
       <WorkspaceToolbar
         branches={db.branches}
         selectedBranchId={selectedBranchId}
@@ -94,8 +118,8 @@ export default function App() {
         onToggleMobileSidebar={() => setMobileSidebarOpen(!mobileSidebarOpen)}
       />
 
-      {/* 3. Main Workspace Area: Sidebar + Active View */}
-      <div className="flex flex-1">
+      {/* 3. Main Workspace Area: Sidebar + Active View + Footer */}
+      <div className="flex flex-1 min-h-0">
         {/* Sidebar */}
         <Sidebar
           currentTab={currentTab}
@@ -110,125 +134,137 @@ export default function App() {
         <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
           <main className="flex-1 p-4 sm:p-6 lg:p-8">
             {currentTab === 'dashboard' && (
-            <DashboardView
-              db={db}
-              onNavigate={(tab) => setCurrentTab(tab)}
-              lang={lang}
-              selectedBranchId={selectedBranchId}
-            />
-          )}
+              <DashboardView
+                db={db}
+                onNavigate={(tab) => setCurrentTab(tab)}
+                lang={lang}
+                selectedBranchId={selectedBranchId}
+              />
+            )}
 
-          {currentTab === 'animals' && (
-            <AnimalsView
-              db={db}
-              onRefreshDb={refreshDb}
-              lang={lang}
-              selectedBranchId={selectedBranchId}
-            />
-          )}
+            {currentTab === 'animals' && (
+              <AnimalsView
+                db={db}
+                onRefreshDb={refreshDb}
+                lang={lang}
+                selectedBranchId={selectedBranchId}
+              />
+            )}
 
-          {currentTab === 'milkProduction' && (
-            <MilkProductionView
-              db={db}
-              onRefreshDb={refreshDb}
-              lang={lang}
-              selectedBranchId={selectedBranchId}
-            />
-          )}
+            {currentTab === 'milkProduction' && (
+              <MilkProductionView
+                db={db}
+                onRefreshDb={refreshDb}
+                lang={lang}
+                selectedBranchId={selectedBranchId}
+              />
+            )}
 
-          {currentTab === 'reconciliation' && (
-            <MilkReconciliationView
-              db={db}
-              onRefreshDb={refreshDb}
-              lang={lang}
-              selectedBranchId={selectedBranchId}
-            />
-          )}
+            {currentTab === 'reconciliation' && (
+              <MilkReconciliationView
+                db={db}
+                onRefreshDb={refreshDb}
+                lang={lang}
+                selectedBranchId={selectedBranchId}
+              />
+            )}
 
-          {currentTab === 'posBilling' && (
-            <PosView
-              db={db}
-              onRefreshDb={refreshDb}
-              lang={lang}
-              selectedBranchId={selectedBranchId}
-              onPrintSale={(sale) => setReceiptSale(sale)}
-            />
-          )}
+            {currentTab === 'posBilling' && (
+              <PosView
+                db={db}
+                onRefreshDb={refreshDb}
+                lang={lang}
+                selectedBranchId={selectedBranchId}
+                onPrintSale={(sale) => setReceiptSale(sale)}
+              />
+            )}
 
-          {currentTab === 'customers' && (
-            <CustomersView
-              db={db}
-              onRefreshDb={refreshDb}
-              lang={lang}
-            />
-          )}
+            {currentTab === 'customers' && (
+              <CustomersView
+                db={db}
+                onRefreshDb={refreshDb}
+                lang={lang}
+              />
+            )}
 
-          {currentTab === 'processing' && (
-            <ProcessingView
-              db={db}
-              onRefreshDb={refreshDb}
-              lang={lang}
-              selectedBranchId={selectedBranchId}
-            />
-          )}
+            {currentTab === 'processing' && (
+              <ProcessingView
+                db={db}
+                onRefreshDb={refreshDb}
+                lang={lang}
+                selectedBranchId={selectedBranchId}
+              />
+            )}
 
-          {currentTab === 'inventoryFeed' && (
-            <InventoryFeedView
-              db={db}
-              onRefreshDb={refreshDb}
-              lang={lang}
-              selectedBranchId={selectedBranchId}
-            />
-          )}
+            {currentTab === 'inventoryFeed' && (
+              <InventoryFeedView
+                db={db}
+                onRefreshDb={refreshDb}
+                lang={lang}
+                selectedBranchId={selectedBranchId}
+              />
+            )}
 
-          {currentTab === 'vetBreeding' && (
-            <VeterinaryBreedingView
-              db={db}
-              onRefreshDb={refreshDb}
-              lang={lang}
-              selectedBranchId={selectedBranchId}
-            />
-          )}
+            {currentTab === 'vetBreeding' && (
+              <VeterinaryBreedingView
+                db={db}
+                onRefreshDb={refreshDb}
+                lang={lang}
+                selectedBranchId={selectedBranchId}
+              />
+            )}
 
-          {currentTab === 'accounting' && (
-            <AccountingView
-              db={db}
-              onRefreshDb={refreshDb}
-              lang={lang}
-              selectedBranchId={selectedBranchId}
-            />
-          )}
+            {currentTab === 'accounting' && (
+              <AccountingView
+                db={db}
+                onRefreshDb={refreshDb}
+                lang={lang}
+                selectedBranchId={selectedBranchId}
+              />
+            )}
 
-          {currentTab === 'employees' && (
-            <EmployeesView
-              db={db}
-              onRefreshDb={refreshDb}
-              lang={lang}
-              selectedBranchId={selectedBranchId}
-            />
-          )}
+            {currentTab === 'employees' && (
+              <EmployeesView
+                db={db}
+                onRefreshDb={refreshDb}
+                lang={lang}
+                selectedBranchId={selectedBranchId}
+              />
+            )}
 
-          {currentTab === 'reports' && (
-            <ReportsView
-              db={db}
-              lang={lang}
-              selectedBranchId={selectedBranchId}
-            />
-          )}
+            {currentTab === 'reports' && (
+              <ReportsView
+                db={db}
+                lang={lang}
+                selectedBranchId={selectedBranchId}
+              />
+            )}
 
-          {currentTab === 'settings' && (
-            <SettingsView
-              db={db}
-              onRefreshDb={refreshDb}
-              lang={lang}
-            />
-          )}
+            {currentTab === 'settings' && (
+              <SettingsView
+                db={db}
+                onRefreshDb={refreshDb}
+                lang={lang}
+              />
+            )}
           </main>
 
           {/* Vibrant Colorful Footer with Powered by M Salman Saleem */}
           <Footer lang={lang} />
         </div>
       </div>
+
+      {/* Global Command / Search Palette Modal */}
+      <GlobalSearchModal
+        isOpen={showSearch}
+        onClose={() => setShowSearch(false)}
+        db={db}
+        onNavigate={(tab) => {
+          setCurrentTab(tab);
+          setShowSearch(false);
+        }}
+        selectedBranchId={selectedBranchId}
+      />
 
       {/* Thermal Receipt Print Modal */}
       <ReceiptModal

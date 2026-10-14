@@ -133,9 +133,9 @@ export const AnimalsView: React.FC<AnimalsViewProps> = ({
         </div>
         <button
           onClick={() => setShowAddModal(true)}
-          className="px-4 py-2 bg-emerald-800 hover:bg-emerald-900 text-white rounded-lg text-xs font-semibold flex items-center gap-2 cursor-pointer shadow-xs self-start sm:self-auto"
+          className="px-4 py-2 bg-gradient-to-r from-[#14532D] to-[#16A34A] hover:from-[#0f4022] hover:to-[#138a3e] text-white rounded-xl text-xs font-bold flex items-center gap-2 cursor-pointer shadow-xs hover:shadow transition-all self-start sm:self-auto transform hover:-translate-y-0.5"
         >
-          <Plus className="w-4 h-4" />
+          <Plus className="w-4 h-4 text-emerald-200" />
           <span>{t.addAnimal}</span>
         </button>
       </div>
