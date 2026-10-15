@@ -5,7 +5,7 @@ import {defineConfig} from 'vite';
 
 export default defineConfig(() => {
   return {
-    base: '/Dairy-Manegment/',
+    base: '/Dairy-Manegment-/',
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {
