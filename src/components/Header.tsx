@@ -153,14 +153,14 @@ export const Header: React.FC<HeaderProps> = ({
       <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-6">
         
         {/* Main Header Bar (56px) */}
-        <div className="flex items-center justify-between h-14 gap-2 sm:gap-3">
+        <div className="flex items-center justify-between h-14 gap-1.5 sm:gap-3">
           
           {/* Left Zone: Hamburger + Brand Logo + Farm Branch Selector */}
-          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          <div className="flex items-center gap-1.5 sm:gap-3 min-w-0 shrink-0">
             {/* Mobile Menu Hamburger */}
             <button
               onClick={onToggleMobileSidebar}
-              className="lg:hidden min-h-[44px] min-w-[44px] flex items-center justify-center p-2 text-white/90 hover:text-white hover:bg-white/10 rounded-xl transition-colors cursor-pointer"
+              className="lg:hidden min-h-[40px] min-w-[40px] flex items-center justify-center p-2 text-white/90 hover:text-white hover:bg-white/10 rounded-xl transition-colors cursor-pointer"
               aria-label="Toggle navigation menu"
             >
               <Menu className="w-5 h-5 text-white" />
@@ -173,7 +173,7 @@ export const Header: React.FC<HeaderProps> = ({
                 e.preventDefault();
                 onNavigate('dashboard');
               }}
-              className="shrink-0 flex items-center gap-2.5 focus:outline-none cursor-pointer group"
+              className="shrink-0 flex items-center gap-2 focus:outline-none cursor-pointer group"
               aria-label="ASK Dairy Management"
             >
               {/* Desktop Full Monogram & Wordmark */}
@@ -252,8 +252,8 @@ export const Header: React.FC<HeaderProps> = ({
             </div>
           </div>
 
-          {/* Center Zone: Quick Search Bar */}
-          <div className="flex-1 max-w-xs sm:max-w-sm mx-1 sm:mx-2">
+          {/* Center Zone: Quick Search Bar (Expanded on sm+ screens) */}
+          <div className="hidden sm:flex sm:flex-1 max-w-xs sm:max-w-sm mx-1 sm:mx-2">
             <button
               type="button"
               onClick={onOpenSearch}
@@ -272,9 +272,20 @@ export const Header: React.FC<HeaderProps> = ({
             </button>
           </div>
 
-          {/* Right Zone: Live Date/Time, Quick Actions, Network Sync, Alerts, Profile */}
-          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          {/* Right Zone: Controls, Compact Mobile Search, Alerts, Language, Profile */}
+          <div className="flex items-center gap-1 sm:gap-2 shrink-0">
             
+            {/* Mobile Compact Search Icon Button (< sm screens) */}
+            <button
+              type="button"
+              onClick={onOpenSearch}
+              className="sm:hidden p-1.5 text-white/90 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
+              title="Search records"
+              aria-label="Search records"
+            >
+              <Search className="w-4 h-4 text-emerald-200" />
+            </button>
+
             {/* Live Clock & Date (Desktop) */}
             <div className="hidden 2xl:flex items-center gap-1.5 text-[11px] font-mono text-emerald-100/90 px-2.5 py-1 rounded-lg bg-black/15 border border-white/10">
               <Clock className="w-3 h-3 text-[#E5C77E]" />
@@ -283,7 +294,7 @@ export const Header: React.FC<HeaderProps> = ({
               <span className="font-bold text-white tabular-nums">{formattedTimeStr}</span>
             </div>
 
-            {/* Quick Action Buttons Strip (Add Milk, Add Animal, POS) */}
+            {/* Quick Action Buttons Strip (Add Milk, Add Animal, POS) - Desktop */}
             <div className="hidden lg:flex items-center gap-1">
               <button
                 onClick={() => onNavigate('milkProduction')}
@@ -304,21 +315,21 @@ export const Header: React.FC<HeaderProps> = ({
               </button>
             </div>
 
-            {/* Master Action Trigger Button */}
+            {/* Master Action Trigger Button (Hidden on mobile where BottomNav has primary action button) */}
             <button
               onClick={onOpenQuickAction}
-              className="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-lg bg-gradient-to-r from-[#E5C77E] to-[#C7A45D] hover:from-[#F3DC9B] hover:to-[#D4B36A] text-[#143929] text-xs font-black shadow-sm transition-all cursor-pointer active:scale-95"
+              className="hidden sm:inline-flex items-center gap-1 px-2.5 sm:px-3 py-1.5 rounded-lg bg-gradient-to-r from-[#E5C77E] to-[#C7A45D] hover:from-[#F3DC9B] hover:to-[#D4B36A] text-[#143929] text-xs font-black shadow-sm transition-all cursor-pointer active:scale-95"
               title="New Farm Entry / Quick Action"
             >
               <Plus className="w-3.5 h-3.5 stroke-[3]" />
-              <span className="hidden sm:inline font-sans">Action</span>
+              <span>Action</span>
             </button>
 
             {/* Online / Offline Sync Indicator */}
             <div className="flex items-center gap-1">
               <button
                 onClick={onToggleOffline}
-                className={`flex items-center gap-1 px-2 py-1 rounded-lg text-[11px] font-semibold transition-colors cursor-pointer border ${
+                className={`flex items-center gap-1 p-1.5 sm:px-2 sm:py-1 rounded-lg text-[11px] font-semibold transition-colors cursor-pointer border ${
                   isOffline
                     ? 'bg-amber-500/20 text-amber-200 border-amber-400/40'
                     : 'bg-emerald-950/40 text-emerald-200 border-emerald-500/30'
@@ -338,11 +349,11 @@ export const Header: React.FC<HeaderProps> = ({
               {pendingSyncCount > 0 && (
                 <button
                   onClick={onSync}
-                  className="flex items-center gap-1 px-2 py-1 rounded-lg bg-blue-500/20 text-blue-200 hover:bg-blue-500/30 border border-blue-400/40 text-[11px] font-mono font-bold cursor-pointer transition-colors"
+                  className="flex items-center gap-1 p-1 sm:px-2 sm:py-1 rounded-lg bg-blue-500/20 text-blue-200 hover:bg-blue-500/30 border border-blue-400/40 text-[11px] font-mono font-bold cursor-pointer transition-colors"
                   title="Sync Pending Offline Changes"
                 >
                   <RefreshCw className="w-3 h-3 text-blue-300 animate-spin" />
-                  <span>{pendingSyncCount}</span>
+                  <span className="text-[10px]">{pendingSyncCount}</span>
                 </button>
               )}
             </div>
@@ -350,13 +361,13 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Notification Center Bell */}
             <button
               onClick={onOpenNotifications}
-              className="relative p-2 text-white/90 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
+              className="relative p-1.5 sm:p-2 text-white/90 hover:text-white hover:bg-white/10 rounded-lg transition-colors cursor-pointer"
               title="Operational Notifications"
               aria-label="Notifications"
             >
               <Bell className="w-4 h-4" />
               {unreadNotificationsCount > 0 && (
-                <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-rose-500 text-white font-mono text-[9px] font-bold flex items-center justify-center ring-2 ring-[#14532D]">
+                <span className="absolute top-0.5 right-0.5 sm:top-1 sm:right-1 w-4 h-4 rounded-full bg-rose-500 text-white font-mono text-[9px] font-bold flex items-center justify-center ring-2 ring-[#14532D]">
                   {unreadNotificationsCount}
                 </span>
               )}
@@ -365,7 +376,7 @@ export const Header: React.FC<HeaderProps> = ({
             {/* Language Toggle (EN / UR) */}
             <button
               onClick={() => onToggleLang(lang === 'en' ? 'ur' : 'en')}
-              className="flex items-center gap-1 px-2 py-1 rounded-lg bg-black/20 hover:bg-black/30 border border-white/15 text-[11px] font-bold text-white transition-colors cursor-pointer"
+              className="flex items-center gap-1 px-1.5 sm:px-2 py-1 rounded-lg bg-black/20 hover:bg-black/30 border border-white/15 text-[11px] font-bold text-white transition-colors cursor-pointer"
               title="Toggle English / اردو"
             >
               <Globe className="w-3 h-3 text-[#E5C77E]" />
@@ -379,7 +390,7 @@ export const Header: React.FC<HeaderProps> = ({
                 className="flex items-center gap-1.5 p-1 rounded-lg hover:bg-white/10 transition-colors cursor-pointer border border-transparent hover:border-white/15"
                 title="User Profile & Role"
               >
-                <div className="w-7 h-7 rounded-md bg-[#E5C77E] text-[#14532D] flex items-center justify-center font-black text-xs shadow-2xs">
+                <div className="w-7 h-7 rounded-md bg-[#E5C77E] text-[#14532D] flex items-center justify-center font-black text-xs shadow-2xs shrink-0">
                   {currentRole === 'super_admin' ? 'SA' : currentRole.charAt(0).toUpperCase()}
                 </div>
                 <div className="hidden lg:block text-left text-xs leading-none">

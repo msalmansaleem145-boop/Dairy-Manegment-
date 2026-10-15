@@ -33,7 +33,7 @@ export const Footer: React.FC<FooterProps> = ({ lang }) => {
   };
 
   return (
-    <footer className="relative mt-auto overflow-hidden bg-gradient-to-r from-[#071E14] via-[#0E3D2B] via-[#0B3546] to-[#141E30] text-white shadow-2xl select-none">
+    <footer className="relative mt-auto overflow-hidden bg-gradient-to-r from-[#071E14] via-[#0E3D2B] via-[#0B3546] to-[#141E30] text-white shadow-2xl select-none pb-24 lg:pb-8">
       {/* 1. Ultra-vibrant top glowing rainbow/aurora strip */}
       <div className="h-1.5 w-full bg-gradient-to-r from-amber-400 via-emerald-400 via-teal-300 via-cyan-400 via-purple-400 to-rose-400 animate-gradient" />
 

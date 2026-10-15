@@ -207,19 +207,19 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </p>
 
               {/* Quick Metrics Strip */}
-              <div className="pt-2 flex flex-wrap items-center gap-4 text-xs font-mono text-emerald-100/90">
+              <div className="pt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-xs font-mono text-emerald-100/90">
                 <span className="flex items-center gap-1.5">
-                  <Milk className="w-3.5 h-3.5 text-[#E5C77E]" />
+                  <Milk className="w-3.5 h-3.5 text-[#E5C77E] shrink-0" />
                   <span>Yield: <strong className="text-white">{totalDailyLitres.toFixed(1)} L</strong></span>
                 </span>
-                <span className="text-white/30">·</span>
+                <span className="hidden sm:inline text-white/30">·</span>
                 <span className="flex items-center gap-1.5">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-300" />
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-300 shrink-0" />
                   <span>Milking: <strong className="text-white">{milkingAnimals}/{totalAnimals} Heads</strong></span>
                 </span>
-                <span className="text-white/30">·</span>
+                <span className="hidden sm:inline text-white/30">·</span>
                 <span className="flex items-center gap-1.5">
-                  <ShoppingBag className="w-3.5 h-3.5 text-amber-300" />
+                  <ShoppingBag className="w-3.5 h-3.5 text-amber-300 shrink-0" />
                   <span>Sales: <strong className="text-white">₨ {totalSalesRevenue.toLocaleString()}</strong></span>
                 </span>
               </div>
@@ -260,106 +260,106 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </span>
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-2.5">
           {/* Shortcut 1: Milk Shift */}
           <button
             onClick={() => onNavigate('milkProduction')}
-            className="p-3 rounded-xl bg-emerald-50/70 hover:bg-emerald-100/80 border border-emerald-200/80 text-left transition-all cursor-pointer group flex flex-col justify-between"
+            className="p-2.5 sm:p-3 rounded-xl bg-emerald-50/70 hover:bg-emerald-100/80 border border-emerald-200/80 text-left transition-all cursor-pointer group flex flex-col justify-between min-w-0"
           >
             <div className="flex items-center justify-between">
-              <div className="p-2 rounded-lg bg-emerald-600 text-white group-hover:scale-105 transition-transform">
+              <div className="p-1.5 sm:p-2 rounded-lg bg-emerald-600 text-white group-hover:scale-105 transition-transform shrink-0">
                 <Milk className="w-4 h-4" />
               </div>
-              <ChevronRight className="w-3.5 h-3.5 text-emerald-700 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <ChevronRight className="w-3.5 h-3.5 text-emerald-700 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
             </div>
-            <div className="mt-2.5">
-              <div className="text-xs font-bold text-emerald-950">Record Milk</div>
-              <div className="text-[10px] text-emerald-700">Morning / Eve Shift</div>
+            <div className="mt-2 min-w-0">
+              <div className="text-xs font-bold text-emerald-950 truncate">Record Milk</div>
+              <div className="text-[10px] text-emerald-700 truncate">Morning / Eve Shift</div>
             </div>
           </button>
 
           {/* Shortcut 2: Animal Registry */}
           <button
             onClick={() => onNavigate('animals')}
-            className="p-3 rounded-xl bg-teal-50/70 hover:bg-teal-100/80 border border-teal-200/80 text-left transition-all cursor-pointer group flex flex-col justify-between"
+            className="p-2.5 sm:p-3 rounded-xl bg-teal-50/70 hover:bg-teal-100/80 border border-teal-200/80 text-left transition-all cursor-pointer group flex flex-col justify-between min-w-0"
           >
             <div className="flex items-center justify-between">
-              <div className="p-2 rounded-lg bg-[#14532D] text-white group-hover:scale-105 transition-transform">
+              <div className="p-1.5 sm:p-2 rounded-lg bg-[#14532D] text-white group-hover:scale-105 transition-transform shrink-0">
                 <ShieldCheck className="w-4 h-4" />
               </div>
-              <ChevronRight className="w-3.5 h-3.5 text-teal-700 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <ChevronRight className="w-3.5 h-3.5 text-teal-700 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
             </div>
-            <div className="mt-2.5">
-              <div className="text-xs font-bold text-neutral-900">New Cattle</div>
-              <div className="text-[10px] text-teal-700">Tag & Pedigree</div>
+            <div className="mt-2 min-w-0">
+              <div className="text-xs font-bold text-neutral-900 truncate">New Cattle</div>
+              <div className="text-[10px] text-teal-700 truncate">Tag & Pedigree</div>
             </div>
           </button>
 
           {/* Shortcut 3: POS Billing */}
           <button
             onClick={() => onNavigate('posBilling')}
-            className="p-3 rounded-xl bg-amber-50/70 hover:bg-amber-100/80 border border-amber-200/80 text-left transition-all cursor-pointer group flex flex-col justify-between"
+            className="p-2.5 sm:p-3 rounded-xl bg-amber-50/70 hover:bg-amber-100/80 border border-amber-200/80 text-left transition-all cursor-pointer group flex flex-col justify-between min-w-0"
           >
             <div className="flex items-center justify-between">
-              <div className="p-2 rounded-lg bg-amber-600 text-white group-hover:scale-105 transition-transform">
+              <div className="p-1.5 sm:p-2 rounded-lg bg-amber-600 text-white group-hover:scale-105 transition-transform shrink-0">
                 <ShoppingBag className="w-4 h-4" />
               </div>
-              <ChevronRight className="w-3.5 h-3.5 text-amber-700 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <ChevronRight className="w-3.5 h-3.5 text-amber-700 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
             </div>
-            <div className="mt-2.5">
-              <div className="text-xs font-bold text-neutral-900">POS Billing</div>
-              <div className="text-[10px] text-amber-800">Direct Cash/Credit</div>
+            <div className="mt-2 min-w-0">
+              <div className="text-xs font-bold text-neutral-900 truncate">POS Billing</div>
+              <div className="text-[10px] text-amber-800 truncate">Direct Cash/Credit</div>
             </div>
           </button>
 
           {/* Shortcut 4: Vet & Breeding */}
           <button
             onClick={() => onNavigate('vetBreeding')}
-            className="p-3 rounded-xl bg-blue-50/70 hover:bg-blue-100/80 border border-blue-200/80 text-left transition-all cursor-pointer group flex flex-col justify-between"
+            className="p-2.5 sm:p-3 rounded-xl bg-blue-50/70 hover:bg-blue-100/80 border border-blue-200/80 text-left transition-all cursor-pointer group flex flex-col justify-between min-w-0"
           >
             <div className="flex items-center justify-between">
-              <div className="p-2 rounded-lg bg-blue-600 text-white group-hover:scale-105 transition-transform">
+              <div className="p-1.5 sm:p-2 rounded-lg bg-blue-600 text-white group-hover:scale-105 transition-transform shrink-0">
                 <HeartPulse className="w-4 h-4" />
               </div>
-              <ChevronRight className="w-3.5 h-3.5 text-blue-700 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <ChevronRight className="w-3.5 h-3.5 text-blue-700 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
             </div>
-            <div className="mt-2.5">
-              <div className="text-xs font-bold text-neutral-900">Vet & Health</div>
-              <div className="text-[10px] text-blue-700">DVM Log & Vaccine</div>
+            <div className="mt-2 min-w-0">
+              <div className="text-xs font-bold text-neutral-900 truncate">Vet & Health</div>
+              <div className="text-[10px] text-blue-700 truncate">DVM Log & Vaccine</div>
             </div>
           </button>
 
           {/* Shortcut 5: Inventory & Feed */}
           <button
             onClick={() => onNavigate('inventoryFeed')}
-            className="p-3 rounded-xl bg-purple-50/70 hover:bg-purple-100/80 border border-purple-200/80 text-left transition-all cursor-pointer group flex flex-col justify-between"
+            className="p-2.5 sm:p-3 rounded-xl bg-purple-50/70 hover:bg-purple-100/80 border border-purple-200/80 text-left transition-all cursor-pointer group flex flex-col justify-between min-w-0"
           >
             <div className="flex items-center justify-between">
-              <div className="p-2 rounded-lg bg-purple-600 text-white group-hover:scale-105 transition-transform">
+              <div className="p-1.5 sm:p-2 rounded-lg bg-purple-600 text-white group-hover:scale-105 transition-transform shrink-0">
                 <Package className="w-4 h-4" />
               </div>
-              <ChevronRight className="w-3.5 h-3.5 text-purple-700 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <ChevronRight className="w-3.5 h-3.5 text-purple-700 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
             </div>
-            <div className="mt-2.5">
-              <div className="text-xs font-bold text-neutral-900">Stock & Feed</div>
-              <div className="text-[10px] text-purple-700">Silage & Wanda PO</div>
+            <div className="mt-2 min-w-0">
+              <div className="text-xs font-bold text-neutral-900 truncate">Stock & Feed</div>
+              <div className="text-[10px] text-purple-700 truncate">Silage & Wanda PO</div>
             </div>
           </button>
 
           {/* Shortcut 6: Khata Ledger */}
           <button
             onClick={() => onNavigate('customers')}
-            className="p-3 rounded-xl bg-rose-50/70 hover:bg-rose-100/80 border border-rose-200/80 text-left transition-all cursor-pointer group flex flex-col justify-between"
+            className="p-2.5 sm:p-3 rounded-xl bg-rose-50/70 hover:bg-rose-100/80 border border-rose-200/80 text-left transition-all cursor-pointer group flex flex-col justify-between min-w-0"
           >
             <div className="flex items-center justify-between">
-              <div className="p-2 rounded-lg bg-rose-600 text-white group-hover:scale-105 transition-transform">
+              <div className="p-1.5 sm:p-2 rounded-lg bg-rose-600 text-white group-hover:scale-105 transition-transform shrink-0">
                 <Users className="w-4 h-4" />
               </div>
-              <ChevronRight className="w-3.5 h-3.5 text-rose-700 opacity-0 group-hover:opacity-100 transition-opacity" />
+              <ChevronRight className="w-3.5 h-3.5 text-rose-700 opacity-0 group-hover:opacity-100 transition-opacity shrink-0" />
             </div>
-            <div className="mt-2.5">
-              <div className="text-xs font-bold text-neutral-900">Khata Ledger</div>
-              <div className="text-[10px] text-rose-700">Customer Credit</div>
+            <div className="mt-2 min-w-0">
+              <div className="text-xs font-bold text-neutral-900 truncate">Khata Ledger</div>
+              <div className="text-[10px] text-rose-700 truncate">Customer Credit</div>
             </div>
           </button>
         </div>
@@ -382,17 +382,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           {/* Alert 1: Expected Calving Alert */}
           <div 
             onClick={() => onNavigate('vetBreeding')}
-            className="p-3.5 rounded-xl border border-amber-200/90 bg-amber-50/60 hover:bg-amber-100/70 transition-colors cursor-pointer group shadow-2xs"
+            className="p-3 sm:p-3.5 rounded-xl border border-amber-200/90 bg-amber-50/60 hover:bg-amber-100/70 transition-colors cursor-pointer group shadow-2xs min-w-0"
           >
-            <div className="flex items-start justify-between gap-2">
-              <div className="flex items-center gap-2">
-                <div className="p-2 rounded-lg bg-amber-100 text-amber-900 shrink-0">
+            <div className="flex items-start justify-between gap-2.5">
+              <div className="flex items-start gap-2.5 min-w-0 flex-1">
+                <div className="p-2 rounded-lg bg-amber-100 text-amber-900 shrink-0 mt-0.5">
                   <Calendar className="w-4 h-4 text-amber-800" />
                 </div>
-                <div>
-                  <div className="text-xs font-bold text-amber-950 flex items-center gap-1.5">
-                    <span>Expected Calving: {calvingAnimalName}</span>
-                    <span className="font-mono text-[10px] bg-amber-200/70 text-amber-900 px-1 rounded font-bold">
+                <div className="min-w-0 flex-1">
+                  <div className="text-xs font-bold text-amber-950 flex flex-wrap items-center gap-1.5">
+                    <span className="truncate">Expected Calving: {calvingAnimalName}</span>
+                    <span className="font-mono text-[10px] bg-amber-200/70 text-amber-900 px-1 rounded font-bold shrink-0">
                       {calvingAnimalTag}
                     </span>
                   </div>
@@ -401,7 +401,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   </div>
                 </div>
               </div>
-              <ChevronRight className="w-4 h-4 text-amber-700 group-hover:translate-x-0.5 transition-transform shrink-0" />
+              <ChevronRight className="w-4 h-4 text-amber-700 group-hover:translate-x-0.5 transition-transform shrink-0 mt-1" />
             </div>
             <div className="mt-2 pt-2 border-t border-amber-200/60 flex items-center justify-between text-[10px] text-amber-900">
               <span className="font-medium">Maternity pen prepared</span>
@@ -412,26 +412,26 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           {/* Alert 2: Milk Withdrawal & Treatment Quarantine */}
           <div 
             onClick={() => onNavigate('vetBreeding')}
-            className="p-3.5 rounded-xl border border-rose-200/90 bg-rose-50/60 hover:bg-rose-100/70 transition-colors cursor-pointer group shadow-2xs"
+            className="p-3 sm:p-3.5 rounded-xl border border-rose-200/90 bg-rose-50/60 hover:bg-rose-100/70 transition-colors cursor-pointer group shadow-2xs min-w-0"
           >
-            <div className="flex items-start justify-between gap-2">
-              <div className="flex items-center gap-2">
-                <div className="p-2 rounded-lg bg-rose-100 text-rose-900 shrink-0">
+            <div className="flex items-start justify-between gap-2.5">
+              <div className="flex items-start gap-2.5 min-w-0 flex-1">
+                <div className="p-2 rounded-lg bg-rose-100 text-rose-900 shrink-0 mt-0.5">
                   <ShieldAlert className="w-4 h-4 text-rose-800" />
                 </div>
-                <div>
-                  <div className="text-xs font-bold text-rose-950 flex items-center gap-1.5">
-                    <span>Milk Withdrawal: {quarantineAnimalName}</span>
-                    <span className="font-mono text-[10px] bg-rose-200/70 text-rose-900 px-1 rounded font-bold">
+                <div className="min-w-0 flex-1">
+                  <div className="text-xs font-bold text-rose-950 flex flex-wrap items-center gap-1.5">
+                    <span className="truncate">Milk Withdrawal: {quarantineAnimalName}</span>
+                    <span className="font-mono text-[10px] bg-rose-200/70 text-rose-900 px-1 rounded font-bold shrink-0">
                       {quarantineAnimalTag}
                     </span>
                   </div>
-                  <div className="text-[11px] text-rose-800 mt-0.5 truncate max-w-[210px]" title={quarantineDiagnosis}>
+                  <div className="text-[11px] text-rose-800 mt-0.5 line-clamp-2" title={quarantineDiagnosis}>
                     {quarantineDiagnosis}
                   </div>
                 </div>
               </div>
-              <ChevronRight className="w-4 h-4 text-rose-700 group-hover:translate-x-0.5 transition-transform shrink-0" />
+              <ChevronRight className="w-4 h-4 text-rose-700 group-hover:translate-x-0.5 transition-transform shrink-0 mt-1" />
             </div>
             <div className="mt-2 pt-2 border-t border-rose-200/60 flex items-center justify-between text-[10px] text-rose-900">
               <span className="font-medium">Tank discard: {quarantineDays} days</span>
@@ -442,26 +442,26 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           {/* Alert 3: Low Inventory Stock */}
           <div 
             onClick={() => onNavigate('inventoryFeed')}
-            className="p-3.5 rounded-xl border border-purple-200/90 bg-purple-50/60 hover:bg-purple-100/70 transition-colors cursor-pointer group shadow-2xs"
+            className="p-3 sm:p-3.5 rounded-xl border border-purple-200/90 bg-purple-50/60 hover:bg-purple-100/70 transition-colors cursor-pointer group shadow-2xs min-w-0"
           >
-            <div className="flex items-start justify-between gap-2">
-              <div className="flex items-center gap-2">
-                <div className="p-2 rounded-lg bg-purple-100 text-purple-900 shrink-0">
+            <div className="flex items-start justify-between gap-2.5">
+              <div className="flex items-start gap-2.5 min-w-0 flex-1">
+                <div className="p-2 rounded-lg bg-purple-100 text-purple-900 shrink-0 mt-0.5">
                   <Package className="w-4 h-4 text-purple-800" />
                 </div>
-                <div>
-                  <div className="text-xs font-bold text-purple-950 flex items-center gap-1.5">
-                    <span>Low Stock Alert</span>
-                    <span className="font-mono text-[10px] bg-purple-200/70 text-purple-900 px-1 rounded font-bold">
+                <div className="min-w-0 flex-1">
+                  <div className="text-xs font-bold text-purple-950 flex flex-wrap items-center gap-1.5">
+                    <span className="truncate">Low Stock Alert</span>
+                    <span className="font-mono text-[10px] bg-purple-200/70 text-purple-900 px-1 rounded font-bold shrink-0">
                       {lowStockItems.length} items
                     </span>
                   </div>
-                  <div className="text-[11px] text-purple-800 mt-0.5 truncate max-w-[210px]">
+                  <div className="text-[11px] text-purple-800 mt-0.5 truncate">
                     {lowStockItems[0]?.name || 'FMD Vaccine vials'} below threshold
                   </div>
                 </div>
               </div>
-              <ChevronRight className="w-4 h-4 text-purple-700 group-hover:translate-x-0.5 transition-transform shrink-0" />
+              <ChevronRight className="w-4 h-4 text-purple-700 group-hover:translate-x-0.5 transition-transform shrink-0 mt-1" />
             </div>
             <div className="mt-2 pt-2 border-t border-purple-200/60 flex items-center justify-between text-[10px] text-purple-900">
               <span className="font-medium">Purchase Order suggested</span>
@@ -469,20 +469,20 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
           </div>
 
-          {/* Alert 4: Veterinary Follow-up Follow-ups */}
+          {/* Alert 4: Veterinary Follow-up */}
           <div 
             onClick={() => onNavigate('vetBreeding')}
-            className="p-3.5 rounded-xl border border-blue-200/90 bg-blue-50/60 hover:bg-blue-100/70 transition-colors cursor-pointer group shadow-2xs"
+            className="p-3 sm:p-3.5 rounded-xl border border-blue-200/90 bg-blue-50/60 hover:bg-blue-100/70 transition-colors cursor-pointer group shadow-2xs min-w-0"
           >
-            <div className="flex items-start justify-between gap-2">
-              <div className="flex items-center gap-2">
-                <div className="p-2 rounded-lg bg-blue-100 text-blue-900 shrink-0">
+            <div className="flex items-start justify-between gap-2.5">
+              <div className="flex items-start gap-2.5 min-w-0 flex-1">
+                <div className="p-2 rounded-lg bg-blue-100 text-blue-900 shrink-0 mt-0.5">
                   <Syringe className="w-4 h-4 text-blue-800" />
                 </div>
-                <div>
-                  <div className="text-xs font-bold text-blue-950 flex items-center gap-1.5">
-                    <span>Vet Follow-up Scheduled</span>
-                    <span className="font-mono text-[10px] bg-blue-200/70 text-blue-900 px-1 rounded font-bold">
+                <div className="min-w-0 flex-1">
+                  <div className="text-xs font-bold text-blue-950 flex flex-wrap items-center gap-1.5">
+                    <span className="truncate">Vet Follow-up Scheduled</span>
+                    <span className="font-mono text-[10px] bg-blue-200/70 text-blue-900 px-1 rounded font-bold shrink-0">
                       {followUpAnimalTag}
                     </span>
                   </div>
@@ -491,7 +491,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                   </div>
                 </div>
               </div>
-              <ChevronRight className="w-4 h-4 text-blue-700 group-hover:translate-x-0.5 transition-transform shrink-0" />
+              <ChevronRight className="w-4 h-4 text-blue-700 group-hover:translate-x-0.5 transition-transform shrink-0 mt-1" />
             </div>
             <div className="mt-2 pt-2 border-t border-blue-200/60 flex items-center justify-between text-[10px] text-blue-900">
               <span className="font-medium">DVM Dr. Imran Qureshi</span>
@@ -502,26 +502,26 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           {/* Alert 5: Milk Stock Reconciliation */}
           <div 
             onClick={() => onNavigate('reconciliation')}
-            className="p-3.5 rounded-xl border border-emerald-200/90 bg-emerald-50/60 hover:bg-emerald-100/70 transition-colors cursor-pointer group shadow-2xs md:col-span-2"
+            className="p-3 sm:p-3.5 rounded-xl border border-emerald-200/90 bg-emerald-50/60 hover:bg-emerald-100/70 transition-colors cursor-pointer group shadow-2xs md:col-span-2 min-w-0"
           >
-            <div className="flex items-start justify-between gap-2">
-              <div className="flex items-center gap-2">
-                <div className="p-2 rounded-lg bg-emerald-100 text-emerald-900 shrink-0">
+            <div className="flex items-start justify-between gap-2.5">
+              <div className="flex items-start gap-2.5 min-w-0 flex-1">
+                <div className="p-2 rounded-lg bg-emerald-100 text-emerald-900 shrink-0 mt-0.5">
                   <CheckCircle2 className="w-4 h-4 text-emerald-800" />
                 </div>
-                <div>
-                  <div className="text-xs font-bold text-emerald-950 flex items-center gap-1.5">
+                <div className="min-w-0 flex-1">
+                  <div className="text-xs font-bold text-emerald-950 flex flex-wrap items-center gap-1.5">
                     <span>Milk Reconciliation: {reconciliation.status === 'balanced' ? 'Balanced (Zero Variance)' : 'Variance Pending'}</span>
-                    <span className="font-mono text-[10px] bg-emerald-200/70 text-emerald-900 px-1.5 rounded font-bold">
+                    <span className="font-mono text-[10px] bg-emerald-200/70 text-emerald-900 px-1.5 rounded font-bold shrink-0">
                       {reconciliation.totalCollected} Litres
                     </span>
                   </div>
-                  <div className="text-[11px] text-emerald-800 mt-0.5">
-                    Sold: <strong className="text-emerald-950">{reconciliation.soldLitres}L</strong> &bull; Calves: <strong className="text-emerald-950">{reconciliation.calfFeedingLitres}L</strong> &bull; Processing: <strong className="text-emerald-950">{reconciliation.processingLitres}L</strong> &bull; Chiller Remaining: <strong className="text-emerald-950">{reconciliation.remainingInChiller}L</strong>
+                  <div className="text-[11px] text-emerald-800 mt-1 leading-relaxed">
+                    Sold: <strong className="text-emerald-950">{reconciliation.soldLitres}L</strong> &bull; Calves: <strong className="text-emerald-950">{reconciliation.calfFeedingLitres}L</strong> &bull; Processing: <strong className="text-emerald-950">{reconciliation.processingLitres}L</strong> &bull; Chiller: <strong className="text-emerald-950">{reconciliation.remainingInChiller}L</strong>
                   </div>
                 </div>
               </div>
-              <ChevronRight className="w-4 h-4 text-emerald-700 group-hover:translate-x-0.5 transition-transform shrink-0" />
+              <ChevronRight className="w-4 h-4 text-emerald-700 group-hover:translate-x-0.5 transition-transform shrink-0 mt-1" />
             </div>
             <div className="mt-2 pt-2 border-t border-emerald-200/60 flex items-center justify-between text-[10px] text-emerald-900">
               <span className="font-medium">Physical sight glass verified</span>
@@ -533,26 +533,28 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       </div>
 
       {/* 4. The 8 Operational KPI Cards Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-3.5">
         
         {/* KPI 1: Today's Milk Yield */}
-        <div className="bg-white rounded-2xl p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all">
+        <div className="bg-white rounded-2xl p-3.5 sm:p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all min-w-0">
           <div className="flex items-center justify-between text-xs text-[#64748B] mb-2">
             <span className="font-semibold text-neutral-700">Today's Milk Yield</span>
             <div className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700">
               <Milk className="w-4 h-4" />
             </div>
           </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-[#172033] font-mono tracking-tight tabular-nums">
-              {totalDailyLitres.toFixed(1)}
-            </span>
-            <span className="text-xs font-semibold text-neutral-500">Litres</span>
-            <span className="ml-auto flex items-center text-[11px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">
+          <div className="flex flex-wrap items-baseline justify-between gap-1.5">
+            <div className="flex items-baseline gap-2">
+              <span className="text-2xl font-black text-[#172033] font-mono tracking-tight tabular-nums">
+                {totalDailyLitres.toFixed(1)}
+              </span>
+              <span className="text-xs font-semibold text-neutral-500">Litres</span>
+            </div>
+            <span className="flex items-center text-[11px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded shrink-0">
               <ArrowUpRight className="w-3 h-3 mr-0.5" /> +6.4%
             </span>
           </div>
-          <div className="mt-2.5 pt-2 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-600 font-mono tabular-nums">
+          <div className="mt-2.5 pt-2 border-t border-neutral-100 flex flex-wrap items-center justify-between text-[11px] text-neutral-600 font-mono tabular-nums gap-1">
             <span>Morn: <strong>{morningLitres.toFixed(1)}L</strong></span>
             <span>Eve: <strong>{eveningLitres.toFixed(1)}L</strong></span>
             <span>Fat: <strong className="text-emerald-800">{avgFat}%</strong></span>
@@ -560,67 +562,69 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         {/* KPI 2: Shift Yield Breakdown */}
-        <div className="bg-white rounded-2xl p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all">
+        <div className="bg-white rounded-2xl p-3.5 sm:p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all min-w-0">
           <div className="flex items-center justify-between text-xs text-[#64748B] mb-2">
             <span className="font-semibold text-neutral-700">Shift Yield Breakdown</span>
             <div className="p-1.5 rounded-lg bg-blue-50 text-blue-700">
               <Scale className="w-4 h-4" />
             </div>
           </div>
-          <div className="flex items-baseline gap-2">
+          <div className="flex flex-wrap items-baseline justify-between gap-1.5">
             <span className="text-xl font-black text-[#172033] font-mono tracking-tight tabular-nums">
               {morningLitres.toFixed(1)}L <span className="text-xs font-normal text-neutral-400">/</span> {eveningLitres.toFixed(1)}L
             </span>
-            <span className="ml-auto text-[10px] font-bold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded">
+            <span className="text-[10px] font-bold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded shrink-0">
               2 Shifts
             </span>
           </div>
-          <div className="mt-2.5 pt-2 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-600 font-mono">
+          <div className="mt-2.5 pt-2 border-t border-neutral-100 flex flex-wrap items-center justify-between text-[11px] text-neutral-600 font-mono gap-1">
             <span>SNF: <strong className="text-blue-800 font-mono">{avgSnf}%</strong></span>
             <span>Chiller: <strong className="text-neutral-900">3.8°C</strong></span>
           </div>
         </div>
 
         {/* KPI 3: Sales & Cash Inflow */}
-        <div className="bg-white rounded-2xl p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all">
+        <div className="bg-white rounded-2xl p-3.5 sm:p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all min-w-0">
           <div className="flex items-center justify-between text-xs text-[#64748B] mb-2">
             <span className="font-semibold text-neutral-700">Sales & Cash Inflow</span>
             <div className="p-1.5 rounded-lg bg-teal-50 text-teal-700">
               <ShoppingBag className="w-4 h-4" />
             </div>
           </div>
-          <div className="flex items-baseline gap-2">
+          <div className="flex flex-wrap items-baseline justify-between gap-1.5">
             <span className="text-2xl font-black text-[#172033] font-mono tracking-tight tabular-nums">
               ₨ {totalSalesRevenue.toLocaleString()}
             </span>
-            <span className="ml-auto flex items-center text-[11px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">
+            <span className="flex items-center text-[11px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded shrink-0">
               <ArrowUpRight className="w-3 h-3 mr-0.5" /> +12.1%
             </span>
           </div>
-          <div className="mt-2.5 pt-2 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-600 font-mono tabular-nums">
+          <div className="mt-2.5 pt-2 border-t border-neutral-100 flex flex-wrap items-center justify-between text-[11px] text-neutral-600 font-mono tabular-nums gap-1">
             <span>Cash: <strong className="text-emerald-700 font-semibold">₨ {totalCashCollected.toLocaleString()}</strong></span>
             <span>Credit: <strong className="text-amber-700">₨ {totalCreditSales.toLocaleString()}</strong></span>
           </div>
         </div>
 
         {/* KPI 4: Herd & Milking Ratio */}
-        <div className="bg-white rounded-2xl p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all">
+        <div className="bg-white rounded-2xl p-3.5 sm:p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all min-w-0">
           <div className="flex items-center justify-between text-xs text-[#64748B] mb-2">
             <span className="font-semibold text-neutral-700">Herd & Milking Heads</span>
             <div className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700">
               <ShieldCheck className="w-4 h-4" />
             </div>
           </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-[#172033] font-mono tracking-tight tabular-nums">
-              {totalAnimals}
-            </span>
-            <span className="text-xs font-semibold text-neutral-500">Heads</span>
-            <span className="ml-auto text-[11px] font-bold text-[#14532D] bg-[#14532D]/10 px-2 py-0.5 rounded font-mono">
+          <div className="flex flex-wrap items-baseline justify-between gap-1.5">
+            <div className="flex items-baseline gap-2">
+              <span className="text-2xl font-black text-[#172033] font-mono tracking-tight tabular-nums">
+                {totalAnimals}
+              </span>
+              <span className="text-xs font-semibold text-neutral-500">Heads</span>
+            </div>
+            <span className="text-[11px] font-bold text-[#14532D] bg-[#14532D]/10 px-2 py-0.5 rounded font-mono shrink-0">
               {milkingAnimals} in Milk
             </span>
           </div>
-          <div className="mt-2.5 pt-2 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-600 font-mono tabular-nums">
+          <div className="mt-2.5 pt-2 border-t border-neutral-100 flex flex-wrap items-center justify-between text-[11px] text-neutral-600 font-mono tabular-nums gap-1">
             <span>Dry: <strong>{dryAnimals}</strong></span>
             <span>Preg: <strong>{pregnantAnimals}</strong></span>
             <span>Sick: <strong className="text-rose-700">{sickAnimals}</strong></span>
@@ -628,67 +632,67 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         {/* KPI 5: Monthly OPEX Expenses */}
-        <div className="bg-white rounded-2xl p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all">
+        <div className="bg-white rounded-2xl p-3.5 sm:p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all min-w-0">
           <div className="flex items-center justify-between text-xs text-[#64748B] mb-2">
             <span className="font-semibold text-neutral-700">Monthly Operating Expenses</span>
             <div className="p-1.5 rounded-lg bg-purple-50 text-purple-700">
               <DollarSign className="w-4 h-4" />
             </div>
           </div>
-          <div className="flex items-baseline gap-2">
+          <div className="flex flex-wrap items-baseline justify-between gap-1.5">
             <span className="text-2xl font-black text-[#172033] font-mono tracking-tight tabular-nums">
               ₨ {monthlyExpenses.toLocaleString()}
             </span>
-            <span className="ml-auto text-[10px] font-bold text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded">
+            <span className="text-[10px] font-bold text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded shrink-0">
               OPEX
             </span>
           </div>
-          <div className="mt-2.5 pt-2 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-600 font-mono tabular-nums">
+          <div className="mt-2.5 pt-2 border-t border-neutral-100 flex flex-wrap items-center justify-between text-[11px] text-neutral-600 font-mono tabular-nums gap-1">
             <span>Feed: <strong>₨ {feedCost.toLocaleString()}</strong></span>
             <span>Labor/Vet: <strong>₨ {(laborCost + vetCost).toLocaleString()}</strong></span>
           </div>
         </div>
 
         {/* KPI 6: Estimated Net Operating Profit */}
-        <div className="bg-white rounded-2xl p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all">
+        <div className="bg-white rounded-2xl p-3.5 sm:p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all min-w-0">
           <div className="flex items-center justify-between text-xs text-[#64748B] mb-2">
             <span className="font-semibold text-neutral-700">Net Operating Profit</span>
             <div className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700">
               <TrendingUp className="w-4 h-4" />
             </div>
           </div>
-          <div className="flex items-baseline gap-2">
+          <div className="flex flex-wrap items-baseline justify-between gap-1.5">
             <span className="text-2xl font-black text-emerald-950 font-mono tracking-tight tabular-nums">
               ₨ {netOperatingProfit.toLocaleString()}
             </span>
-            <span className="ml-auto text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded font-mono">
+            <span className="text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded font-mono shrink-0">
               {profitMarginPercent}% Margin
             </span>
           </div>
-          <div className="mt-2.5 pt-2 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-600 font-mono tabular-nums">
+          <div className="mt-2.5 pt-2 border-t border-neutral-100 flex flex-wrap items-center justify-between text-[11px] text-neutral-600 font-mono tabular-nums gap-1">
             <span>Gross: <strong>₨ {grossProfit.toLocaleString()}</strong></span>
             <span className="text-emerald-700 font-semibold">Ledger Audited</span>
           </div>
         </div>
 
         {/* KPI 7: Pending Customer Khata Receivables */}
-        <div className="bg-white rounded-2xl p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all">
+        <div className="bg-white rounded-2xl p-3.5 sm:p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all min-w-0">
           <div className="flex items-center justify-between text-xs text-[#64748B] mb-2">
             <span className="font-semibold text-neutral-700">Pending Receivables (Khata)</span>
             <div className="p-1.5 rounded-lg bg-amber-50 text-amber-700">
               <Users className="w-4 h-4" />
             </div>
           </div>
-          <div className="flex items-baseline gap-2">
+          <div className="flex flex-wrap items-baseline justify-between gap-1.5">
             <span className="text-2xl font-black text-amber-950 font-mono tracking-tight tabular-nums">
               ₨ {receivables.toLocaleString()}
             </span>
-            <span className="ml-auto text-[10px] font-bold text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
+            <span className="text-[10px] font-bold text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200 shrink-0">
               {overdueCustomersCount} Near Limit
             </span>
           </div>
-          <div className="mt-2.5 pt-2 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-600 font-mono">
-            <span>Active Customers: <strong>{db.customers.length}</strong></span>
+          <div className="mt-2.5 pt-2 border-t border-neutral-100 flex flex-wrap items-center justify-between text-[11px] text-neutral-600 font-mono gap-1">
+            <span>Active: <strong>{db.customers.length}</strong></span>
             <button 
               onClick={() => onNavigate('customers')}
               className="text-amber-800 font-bold hover:underline"
@@ -699,23 +703,25 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         {/* KPI 8: Low Stock Alerts */}
-        <div className="bg-white rounded-2xl p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all">
+        <div className="bg-white rounded-2xl p-3.5 sm:p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all min-w-0">
           <div className="flex items-center justify-between text-xs text-[#64748B] mb-2">
             <span className="font-semibold text-neutral-700">Inventory Stock Status</span>
             <div className="p-1.5 rounded-lg bg-rose-50 text-rose-700">
               <Package className="w-4 h-4" />
             </div>
           </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-[#172033] font-mono tracking-tight tabular-nums">
-              {lowStockItems.length}
-            </span>
-            <span className="text-xs font-semibold text-neutral-500">Items Low</span>
-            <span className="ml-auto text-[10px] font-bold text-rose-800 bg-rose-100 px-1.5 py-0.5 rounded">
+          <div className="flex flex-wrap items-baseline justify-between gap-1.5">
+            <div className="flex items-baseline gap-2">
+              <span className="text-2xl font-black text-[#172033] font-mono tracking-tight tabular-nums">
+                {lowStockItems.length}
+              </span>
+              <span className="text-xs font-semibold text-neutral-500">Items Low</span>
+            </div>
+            <span className="text-[10px] font-bold text-rose-800 bg-rose-100 px-1.5 py-0.5 rounded shrink-0">
               Action Needed
             </span>
           </div>
-          <div className="mt-2.5 pt-2 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-600 font-mono">
+          <div className="mt-2.5 pt-2 border-t border-neutral-100 flex flex-wrap items-center justify-between text-[11px] text-neutral-600 font-mono gap-1">
             <span>Vaccines & Silage</span>
             <button 
               onClick={() => onNavigate('inventoryFeed')}
@@ -795,25 +801,25 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             />
           </div>
 
-          <div className="flex flex-wrap items-center justify-between text-[11px] text-neutral-600 font-mono tabular-nums gap-y-1 pt-1">
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-[11px] text-neutral-600 font-mono tabular-nums pt-1">
             <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-emerald-600" />
+              <span className="w-2 h-2 rounded-full bg-emerald-600 shrink-0" />
               <span>POS Sales: <strong>{reconciliation.soldLitres}L</strong></span>
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-blue-500" />
+              <span className="w-2 h-2 rounded-full bg-blue-500 shrink-0" />
               <span>Calves: <strong>{reconciliation.calfFeedingLitres}L</strong></span>
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-amber-500" />
+              <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
               <span>Ghee Processing: <strong>{reconciliation.processingLitres}L</strong></span>
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-purple-500" />
+              <span className="w-2 h-2 rounded-full bg-purple-500 shrink-0" />
               <span>Staff: <strong>{reconciliation.householdStaffLitres}L</strong></span>
             </span>
             <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-teal-500" />
+              <span className="w-2 h-2 rounded-full bg-teal-500 shrink-0" />
               <span>Chiller Stock: <strong>{reconciliation.remainingInChiller}L</strong></span>
             </span>
           </div>
@@ -848,17 +854,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               return (
                 <div 
                   key={rec.id}
-                  className="flex items-center justify-between p-2.5 rounded-xl bg-neutral-50/70 hover:bg-neutral-100/80 transition-colors text-xs"
+                  className="flex items-center justify-between p-2.5 rounded-xl bg-neutral-50/70 hover:bg-neutral-100/80 transition-colors text-xs gap-2"
                 >
-                  <div className="flex items-center gap-2.5 truncate">
-                    <span className="font-mono font-bold text-emerald-950 bg-emerald-100/70 px-1.5 py-0.5 rounded text-[11px]">
+                  <div className="flex items-center gap-2 truncate min-w-0 flex-1">
+                    <span className="font-mono font-bold text-emerald-950 bg-emerald-100/70 px-1.5 py-0.5 rounded text-[11px] shrink-0">
                       {rec.shift === 'morning' ? 'Morn' : 'Eve'}
                     </span>
-                    <div className="truncate">
+                    <div className="truncate min-w-0">
                       <div className="font-bold text-neutral-900 truncate">
                         {animal?.name || 'Dairy Cow'} <span className="font-mono text-neutral-500 font-normal">({animal?.earTag || 'PK-Tag'})</span>
                       </div>
-                      <div className="text-[10px] text-neutral-400 font-mono">
+                      <div className="text-[10px] text-neutral-400 font-mono truncate">
                         Fat: {rec.fatPercentage}% &middot; SNF: {rec.snfPercentage}%
                       </div>
                     </div>
@@ -897,21 +903,21 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             {recentSales.map((sale) => (
               <div 
                 key={sale.id}
-                className="flex items-center justify-between p-2.5 rounded-xl bg-neutral-50/70 hover:bg-neutral-100/80 transition-colors text-xs"
+                className="flex items-center justify-between p-2.5 rounded-xl bg-neutral-50/70 hover:bg-neutral-100/80 transition-colors text-xs gap-2"
               >
-                <div className="flex items-center gap-2.5 truncate">
-                  <span className={`font-mono font-bold px-1.5 py-0.5 rounded text-[10px] uppercase ${
+                <div className="flex items-center gap-2 truncate min-w-0 flex-1">
+                  <span className={`font-mono font-bold px-1.5 py-0.5 rounded text-[10px] uppercase shrink-0 ${
                     sale.paymentMethod === 'cash' 
                       ? 'bg-emerald-100 text-emerald-800' 
                       : 'bg-amber-100 text-amber-800'
                   }`}>
                     {sale.paymentMethod}
                   </span>
-                  <div className="truncate">
+                  <div className="truncate min-w-0">
                     <div className="font-bold text-neutral-900 truncate">
                       {sale.customerName}
                     </div>
-                    <div className="text-[10px] text-neutral-400 font-mono">
+                    <div className="text-[10px] text-neutral-400 font-mono truncate">
                       {sale.items.length} item(s) &middot; {sale.invoiceNumber}
                     </div>
                   </div>
