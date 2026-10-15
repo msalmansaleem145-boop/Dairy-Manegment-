@@ -3,7 +3,6 @@ import { UserRole, Sale } from './types';
 import { DairyDatabaseService, AppDatabase } from './services/storage';
 import { Language } from './i18n/translations';
 import { Header } from './components/Header';
-import { WorkspaceToolbar } from './components/WorkspaceToolbar';
 import { Sidebar } from './components/Sidebar';
 import { ReceiptModal } from './components/ReceiptModal';
 import { NotificationCenter } from './components/NotificationCenter';
@@ -83,7 +82,7 @@ export default function App() {
 
   return (
     <div className={`min-h-screen flex flex-col bg-[#F5F7FA] text-neutral-900 ${lang === 'ur' ? 'rtl' : 'ltr'}`} dir={lang === 'ur' ? 'rtl' : 'ltr'}>
-      {/* 1. Header with Breadcrumbs, Global Search, User Profile, Notifications & Quick Actions */}
+      {/* 1. Sleek Compact 56px Enterprise Header */}
       <Header
         currentTab={currentTab}
         onNavigate={(tab) => setCurrentTab(tab)}
@@ -98,27 +97,14 @@ export default function App() {
         onChangeRole={(role) => setCurrentRole(role)}
         lang={lang}
         onToggleLang={(newLang) => setLang(newLang)}
-      />
-
-      {/* 2. Workspace Control Toolbar (Branch, Role, Network, Sync & Drawer) */}
-      <WorkspaceToolbar
-        branches={db.branches}
-        selectedBranchId={selectedBranchId}
-        onSelectBranch={(id) => setSelectedBranchId(id)}
-        currentRole={currentRole}
-        onChangeRole={(role) => setCurrentRole(role)}
-        lang={lang}
-        onToggleLang={(newLang) => setLang(newLang)}
         isOffline={isOffline}
         onToggleOffline={() => setIsOffline(!isOffline)}
         pendingSyncCount={pendingQueueCount}
         onSync={handleSyncOfflineQueue}
-        unreadNotificationsCount={unreadNotificationsCount}
-        onOpenNotifications={() => setShowNotifications(true)}
         onToggleMobileSidebar={() => setMobileSidebarOpen(!mobileSidebarOpen)}
       />
 
-      {/* 3. Main Workspace Area: Sidebar + Active View + Footer */}
+      {/* 2. Main Workspace Area: Sidebar + Active View + Footer */}
       <div className="flex flex-1 min-h-0">
         {/* Sidebar */}
         <Sidebar

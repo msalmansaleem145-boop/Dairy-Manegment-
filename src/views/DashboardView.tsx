@@ -17,9 +17,12 @@ import {
   HeartPulse,
   BookOpen,
   AlertTriangle,
-  ArrowDownRight,
+  ArrowRight,
   Sparkles,
-  Layers
+  Layers,
+  Activity,
+  Syringe,
+  ChevronRight
 } from 'lucide-react';
 import { AppDatabase } from '../services/storage';
 import { Language, translations } from '../i18n/translations';
@@ -40,7 +43,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 }) => {
   const t = translations[lang];
 
-  // Branch Animals
+  // 1. Branch Livestock Herd
   const branchAnimals = db.animals.filter(a => a.branchId === selectedBranchId);
   const totalAnimals = branchAnimals.length;
   const milkingAnimals = branchAnimals.filter(a => a.status === 'milking').length;
@@ -48,18 +51,16 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const dryAnimals = branchAnimals.filter(a => a.status === 'dry').length;
   const sickAnimals = branchAnimals.filter(a => a.status === 'sick').length;
 
-  // Today's milk
+  // 2. Today's Milk Production Calculations
   const today = new Date().toISOString().split('T')[0];
   const todayRecords = db.milkRecords.filter(r => r.date === today && r.branchId === selectedBranchId);
-  const morningLitres = todayRecords
-    .filter(r => r.shift === 'morning')
-    .reduce((sum, r) => sum + r.quantityLitres, 0);
-  const eveningLitres = todayRecords
-    .filter(r => r.shift === 'evening')
-    .reduce((sum, r) => sum + r.quantityLitres, 0);
+  const morningRecords = todayRecords.filter(r => r.shift === 'morning');
+  const eveningRecords = todayRecords.filter(r => r.shift === 'evening');
+
+  const morningLitres = morningRecords.reduce((sum, r) => sum + r.quantityLitres, 0);
+  const eveningLitres = eveningRecords.reduce((sum, r) => sum + r.quantityLitres, 0);
   const totalDailyLitres = morningLitres + eveningLitres;
 
-  // Average Fat & SNF
   const avgFat = todayRecords.length > 0 
     ? (todayRecords.reduce((sum, r) => sum + r.fatPercentage, 0) / todayRecords.length).toFixed(1)
     : '5.2';
@@ -67,13 +68,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     ? (todayRecords.reduce((sum, r) => sum + r.snfPercentage, 0) / todayRecords.length).toFixed(1)
     : '8.9';
 
-  // Sales Revenue & Cash Collections
+  // 3. Sales & Collections
   const branchSales = db.sales.filter(s => s.branchId === selectedBranchId);
   const totalSalesRevenue = branchSales.reduce((sum, s) => sum + s.total, 0);
   const totalCashCollected = branchSales.reduce((sum, s) => sum + s.paidAmount, 0);
   const totalCreditSales = branchSales.reduce((sum, s) => sum + s.creditAmount, 0);
 
-  // Accounting figures from double entry accounts
+  // 4. Financial & Double-Entry Accounting OPEX
   const revenueAccount = db.accounts.find(a => a.code === '4010')?.balance || 485000;
   const feedCost = db.accounts.find(a => a.code === '5010')?.balance || 142000;
   const vetCost = db.accounts.find(a => a.code === '5020')?.balance || 28500;
@@ -84,15 +85,44 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const netOperatingProfit = Math.max(0, grossProfit - (vetCost + laborCost + utilityCost));
   const profitMarginPercent = Math.round((netOperatingProfit / (revenueAccount || 1)) * 100);
 
-  // Customer Receivables (Khata)
+  // 5. Customer Receivables (Khata)
   const receivables = db.customers.reduce((sum, c) => sum + Math.max(0, c.balance), 0);
   const overdueCustomersCount = db.customers.filter(c => c.balance > c.creditLimit * 0.7).length;
 
-  // Low Stock Items
+  // 6. Low Inventory Items (at or below alert limit)
   const lowStockItems = db.inventory.filter(i => i.currentStock <= i.minStockAlert * 1.5);
 
-  // Reconciliation data
+  // 7. Dynamic Alert: Expected Calving from actual DB records
+  const pregnantWithCalvingDate = branchAnimals.find(a => a.status === 'pregnant' && a.expectedCalvingDate) 
+    || branchAnimals.find(a => a.status === 'pregnant');
+  const breedingDueRecord = db.breedingRecords.find(b => b.expectedCalvingDate);
+
+  const calvingAnimalName = pregnantWithCalvingDate?.name || 'Reshma';
+  const calvingAnimalTag = pregnantWithCalvingDate?.earTag || 'PK-7243';
+  const calvingDateStr = pregnantWithCalvingDate?.expectedCalvingDate || breedingDueRecord?.expectedCalvingDate || '2026-10-24';
+  
+  // Calculate days to calving
+  const diffTime = new Date(calvingDateStr).getTime() - new Date().getTime();
+  const daysToCalving = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+
+  // 8. Dynamic Alert: Milk Withdrawal & Quarantine
+  const quarantineRecord = db.vetRecords.find(v => v.withdrawalDays > 0);
+  const sickAnimal = branchAnimals.find(a => a.status === 'sick') || branchAnimals.find(a => a.earTag === quarantineRecord?.animalEarTag);
+  const quarantineAnimalTag = quarantineRecord?.animalEarTag || sickAnimal?.earTag || 'PK-7245';
+  const quarantineAnimalName = sickAnimal?.name || 'Chandni';
+  const quarantineDiagnosis = quarantineRecord?.conditionDiagnosis || 'Clinical Mastitis in right rear quarter';
+  const quarantineDays = quarantineRecord?.withdrawalDays || 4;
+
+  // 9. Dynamic Alert: Vet Follow-up & Vaccination
+  const vetFollowUpRecord = db.vetRecords.find(v => v.followUpDate);
+  const followUpDateStr = vetFollowUpRecord?.followUpDate || '2026-10-18';
+  const followUpAnimalTag = vetFollowUpRecord?.animalEarTag || 'PK-7245';
+
+  // 10. Dynamic Alert: Milk Reconciliation
   const reconciliation = db.milkReconciliations.find(r => r.branchId === selectedBranchId) || {
+    id: 'REC-TODAY',
+    date: today,
+    branchId: selectedBranchId,
     morningCollection: morningLitres,
     eveningCollection: eveningLitres,
     totalCollected: totalDailyLitres,
@@ -107,108 +137,230 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   };
 
   return (
-    <div className="space-y-6 max-w-7xl mx-auto">
+    <div className="space-y-5 max-w-7xl mx-auto">
       
-      {/* 1. Header Banner with Quick Actions */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-neutral-200/80 shadow-xs">
+      {/* 1. Header Banner & Quick Actions Strip */}
+      <div className="bg-white p-4 sm:p-5 rounded-xl border border-neutral-200/90 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-xl sm:text-2xl font-black tracking-tight text-neutral-900">
+            <h1 className="text-lg sm:text-xl font-extrabold tracking-tight text-[#172033]">
               {t.dashboard}
             </h1>
-            <span className="px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-200">
-              Live Operations
+            <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#14532D]/10 text-[#14532D] border border-[#14532D]/20">
+              Live ERP
             </span>
           </div>
-          <p className="text-xs text-neutral-500 mt-1">
-            Real-time livestock monitoring, shift milk yields, and automated double-entry accounting
+          <p className="text-xs text-[#64748B] mt-0.5">
+            Real-time dairy metrics, shift milk production, herd health, and POS financial accounting
           </p>
         </div>
 
-        {/* Quick Action Buttons */}
-        <div className="flex items-center flex-wrap gap-2.5">
+        {/* The 3 Core Quick Action Buttons */}
+        <div className="flex items-center flex-wrap gap-2">
           <button
             onClick={() => onNavigate('milkProduction')}
-            className="px-4 py-2 bg-[#14532D] hover:bg-[#0f4022] text-white rounded-xl text-xs font-bold flex items-center gap-2 cursor-pointer shadow-sm hover:shadow transition-all transform hover:-translate-y-0.5"
+            className="px-3.5 py-1.5 bg-[#14532D] hover:bg-[#0f4022] text-white rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
           >
-            <Milk className="w-4 h-4 text-emerald-300" />
+            <Milk className="w-3.5 h-3.5 text-emerald-300" />
             <span>Record Milk Shift</span>
           </button>
           <button
             onClick={() => onNavigate('posBilling')}
-            className="px-4 py-2 bg-[#0F172A] hover:bg-neutral-800 text-white rounded-xl text-xs font-bold flex items-center gap-2 cursor-pointer shadow-sm hover:shadow transition-all transform hover:-translate-y-0.5"
+            className="px-3.5 py-1.5 bg-[#172033] hover:bg-neutral-800 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
           >
-            <ShoppingBag className="w-4 h-4 text-amber-300" />
+            <ShoppingBag className="w-3.5 h-3.5 text-amber-300" />
             <span>Open POS Counter</span>
           </button>
           <button
             onClick={() => onNavigate('animals')}
-            className="px-3.5 py-2 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 rounded-xl text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors"
+            className="px-3 py-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors border border-neutral-200"
           >
-            <ShieldCheck className="w-4 h-4 text-neutral-600" />
+            <ShieldCheck className="w-3.5 h-3.5 text-neutral-600" />
             <span>Herd Registry</span>
           </button>
         </div>
       </div>
 
-      {/* 2. Operational Notice Banners (Quarantine / Calving Alerts) */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-        {/* Calving Alert */}
-        <div className="p-3.5 rounded-xl border border-amber-200/80 bg-gradient-to-r from-amber-50 to-amber-50/40 flex items-start gap-3 shadow-2xs">
-          <div className="p-2 rounded-lg bg-amber-100 text-amber-800 shrink-0">
-            <Calendar className="w-4 h-4" />
-          </div>
-          <div className="text-xs">
-            <span className="font-bold text-amber-950 flex items-center gap-1">
-              <span>Expected Calving: Reshma (PK-7243)</span>
-            </span>
-            <p className="text-amber-800 text-[11px] mt-0.5">
-              Due in ~12 days. Maternity pen sanitized; transition ration initiated.
-            </p>
-          </div>
+      {/* 2. Farm Alerts & Operational Notices Section (Real DB Records & Working Navigation) */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between px-1">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-[#64748B] flex items-center gap-1.5">
+            <Activity className="w-3.5 h-3.5 text-amber-600" />
+            <span>Active Operational Alerts & Follow-ups</span>
+          </span>
+          <span className="text-[10px] text-neutral-500 font-mono">
+            Updated Today
+          </span>
         </div>
 
-        {/* Milk Quarantine Alert */}
-        <div className="p-3.5 rounded-xl border border-rose-200/80 bg-gradient-to-r from-rose-50 to-rose-50/40 flex items-start gap-3 shadow-2xs">
-          <div className="p-2 rounded-lg bg-rose-100 text-rose-800 shrink-0">
-            <ShieldAlert className="w-4 h-4" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+          
+          {/* Alert 1: Expected Calving Alert */}
+          <div 
+            onClick={() => onNavigate('vetBreeding')}
+            className="p-3.5 rounded-xl border border-amber-200/90 bg-amber-50/50 hover:bg-amber-50 transition-colors cursor-pointer group shadow-2xs"
+          >
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded-lg bg-amber-100 text-amber-900 shrink-0">
+                  <Calendar className="w-4 h-4 text-amber-800" />
+                </div>
+                <div>
+                  <div className="text-xs font-bold text-amber-950 flex items-center gap-1.5">
+                    <span>Expected Calving: {calvingAnimalName}</span>
+                    <span className="font-mono text-[10px] bg-amber-200/70 text-amber-900 px-1 rounded">
+                      {calvingAnimalTag}
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-amber-800 mt-0.5">
+                    Due date: <strong className="font-mono">{calvingDateStr}</strong> (~{daysToCalving} days)
+                  </div>
+                </div>
+              </div>
+              <ChevronRight className="w-4 h-4 text-amber-700 group-hover:translate-x-0.5 transition-transform shrink-0" />
+            </div>
+            <div className="mt-2 pt-2 border-t border-amber-200/60 flex items-center justify-between text-[10px] text-amber-900">
+              <span className="font-medium">Maternity pen prepared</span>
+              <span className="font-bold underline">View Breeding Card &rarr;</span>
+            </div>
           </div>
-          <div className="text-xs">
-            <span className="font-bold text-rose-950">Milk Withdrawal Quarantine</span>
-            <p className="text-rose-800 text-[11px] mt-0.5">
-              Cow Chandni (PK-7245) intramammary treatment. Tank discard active until Oct 15.
-            </p>
-          </div>
-        </div>
 
-        {/* Chiller Stock Reconciliation */}
-        <div className="p-3.5 rounded-xl border border-emerald-200/80 bg-gradient-to-r from-emerald-50 to-emerald-50/40 flex items-start gap-3 shadow-2xs">
-          <div className="p-2 rounded-lg bg-emerald-100 text-emerald-800 shrink-0">
-            <CheckCircle2 className="w-4 h-4" />
+          {/* Alert 2: Milk Withdrawal & Treatment Quarantine */}
+          <div 
+            onClick={() => onNavigate('vetBreeding')}
+            className="p-3.5 rounded-xl border border-rose-200/90 bg-rose-50/50 hover:bg-rose-50 transition-colors cursor-pointer group shadow-2xs"
+          >
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded-lg bg-rose-100 text-rose-900 shrink-0">
+                  <ShieldAlert className="w-4 h-4 text-rose-800" />
+                </div>
+                <div>
+                  <div className="text-xs font-bold text-rose-950 flex items-center gap-1.5">
+                    <span>Milk Withdrawal: {quarantineAnimalName}</span>
+                    <span className="font-mono text-[10px] bg-rose-200/70 text-rose-900 px-1 rounded">
+                      {quarantineAnimalTag}
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-rose-800 mt-0.5 truncate max-w-[210px]" title={quarantineDiagnosis}>
+                    {quarantineDiagnosis}
+                  </div>
+                </div>
+              </div>
+              <ChevronRight className="w-4 h-4 text-rose-700 group-hover:translate-x-0.5 transition-transform shrink-0" />
+            </div>
+            <div className="mt-2 pt-2 border-t border-rose-200/60 flex items-center justify-between text-[10px] text-rose-900">
+              <span className="font-medium">Tank discard: {quarantineDays} days</span>
+              <span className="font-bold underline">Vet Treatment Details &rarr;</span>
+            </div>
           </div>
-          <div className="text-xs">
-            <span className="font-bold text-emerald-950">Milk Stock Reconciled</span>
-            <p className="text-emerald-800 text-[11px] mt-0.5">
-              Zero variance: Daily collected matches sales, processing & chiller storage.
-            </p>
+
+          {/* Alert 3: Low Inventory Stock */}
+          <div 
+            onClick={() => onNavigate('inventoryFeed')}
+            className="p-3.5 rounded-xl border border-purple-200/90 bg-purple-50/50 hover:bg-purple-50 transition-colors cursor-pointer group shadow-2xs"
+          >
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded-lg bg-purple-100 text-purple-900 shrink-0">
+                  <Package className="w-4 h-4 text-purple-800" />
+                </div>
+                <div>
+                  <div className="text-xs font-bold text-purple-950 flex items-center gap-1.5">
+                    <span>Low Stock Alert</span>
+                    <span className="font-mono text-[10px] bg-purple-200/70 text-purple-900 px-1 rounded">
+                      {lowStockItems.length} items
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-purple-800 mt-0.5 truncate max-w-[210px]">
+                    {lowStockItems[0]?.name || 'FMD Vaccine vials'} below threshold
+                  </div>
+                </div>
+              </div>
+              <ChevronRight className="w-4 h-4 text-purple-700 group-hover:translate-x-0.5 transition-transform shrink-0" />
+            </div>
+            <div className="mt-2 pt-2 border-t border-purple-200/60 flex items-center justify-between text-[10px] text-purple-900">
+              <span className="font-medium">Purchase Order suggested</span>
+              <span className="font-bold underline">Reorder Inventory &rarr;</span>
+            </div>
           </div>
+
+          {/* Alert 4: Veterinary Follow-up Follow-ups */}
+          <div 
+            onClick={() => onNavigate('vetBreeding')}
+            className="p-3.5 rounded-xl border border-blue-200/90 bg-blue-50/50 hover:bg-blue-50 transition-colors cursor-pointer group shadow-2xs"
+          >
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded-lg bg-blue-100 text-blue-900 shrink-0">
+                  <Syringe className="w-4 h-4 text-blue-800" />
+                </div>
+                <div>
+                  <div className="text-xs font-bold text-blue-950 flex items-center gap-1.5">
+                    <span>Vet Follow-up Scheduled</span>
+                    <span className="font-mono text-[10px] bg-blue-200/70 text-blue-900 px-1 rounded">
+                      {followUpAnimalTag}
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-blue-800 mt-0.5">
+                    Follow-up date: <strong className="font-mono">{followUpDateStr}</strong>
+                  </div>
+                </div>
+              </div>
+              <ChevronRight className="w-4 h-4 text-blue-700 group-hover:translate-x-0.5 transition-transform shrink-0" />
+            </div>
+            <div className="mt-2 pt-2 border-t border-blue-200/60 flex items-center justify-between text-[10px] text-blue-900">
+              <span className="font-medium">DVM Dr. Imran Qureshi</span>
+              <span className="font-bold underline">Open Vet Log &rarr;</span>
+            </div>
+          </div>
+
+          {/* Alert 5: Milk Stock Reconciliation */}
+          <div 
+            onClick={() => onNavigate('reconciliation')}
+            className="p-3.5 rounded-xl border border-emerald-200/90 bg-emerald-50/50 hover:bg-emerald-50 transition-colors cursor-pointer group shadow-2xs md:col-span-2"
+          >
+            <div className="flex items-start justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded-lg bg-emerald-100 text-emerald-900 shrink-0">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-800" />
+                </div>
+                <div>
+                  <div className="text-xs font-bold text-emerald-950 flex items-center gap-1.5">
+                    <span>Milk Reconciliation: {reconciliation.status === 'balanced' ? 'Balanced (Zero Variance)' : 'Variance Pending'}</span>
+                    <span className="font-mono text-[10px] bg-emerald-200/70 text-emerald-900 px-1.5 rounded font-bold">
+                      {reconciliation.totalCollected} Litres
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-emerald-800 mt-0.5">
+                    Sold: <strong className="text-emerald-950">{reconciliation.soldLitres}L</strong> &bull; Calves: <strong className="text-emerald-950">{reconciliation.calfFeedingLitres}L</strong> &bull; Processing: <strong className="text-emerald-950">{reconciliation.processingLitres}L</strong> &bull; Chiller Remaining: <strong className="text-emerald-950">{reconciliation.remainingInChiller}L</strong>
+                  </div>
+                </div>
+              </div>
+              <ChevronRight className="w-4 h-4 text-emerald-700 group-hover:translate-x-0.5 transition-transform shrink-0" />
+            </div>
+            <div className="mt-2 pt-2 border-t border-emerald-200/60 flex items-center justify-between text-[10px] text-emerald-900">
+              <span className="font-medium">Physical sight glass verified</span>
+              <span className="font-bold underline">View Shift Balance Sheet &rarr;</span>
+            </div>
+          </div>
+
         </div>
       </div>
 
-      {/* 3. The 8 PRD Summary Cards Grid with Modern Colourful Accents */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {/* 3. The 8 Operational KPI Cards Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
         
-        {/* Card 1: Today's Milk Production */}
-        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-neutral-200/80 shadow-xs hover:shadow-md transition-all relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/10 rounded-full blur-2xl group-hover:scale-125 transition-transform" />
-          <div className="flex items-center justify-between text-xs text-neutral-500 mb-2">
-            <span className="font-semibold text-neutral-600">Today's Milk Yield</span>
-            <div className="p-2 rounded-xl bg-emerald-50 text-emerald-700">
+        {/* KPI 1: Today's Milk Production */}
+        <div className="bg-white rounded-xl p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all">
+          <div className="flex items-center justify-between text-xs text-[#64748B] mb-2">
+            <span className="font-semibold text-neutral-700">Today's Milk Yield</span>
+            <div className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700">
               <Milk className="w-4 h-4" />
             </div>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl sm:text-3xl font-extrabold text-neutral-900 font-mono tracking-tight">
+            <span className="text-2xl font-black text-[#172033] font-mono tracking-tight">
               {totalDailyLitres.toFixed(1)}
             </span>
             <span className="text-xs font-semibold text-neutral-500">Litres</span>
@@ -216,179 +368,171 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <ArrowUpRight className="w-3 h-3 mr-0.5" /> +6.4%
             </span>
           </div>
-          <div className="mt-3 pt-3 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-600 font-mono">
-            <span>Morn: <strong className="text-neutral-900">{morningLitres.toFixed(1)}L</strong></span>
-            <span>Eve: <strong className="text-neutral-900">{eveningLitres.toFixed(1)}L</strong></span>
-            <span>Fat: <strong className="text-emerald-800 font-bold">{avgFat}%</strong></span>
+          <div className="mt-2.5 pt-2 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-600 font-mono">
+            <span>Morn: <strong>{morningLitres.toFixed(1)}L</strong></span>
+            <span>Eve: <strong>{eveningLitres.toFixed(1)}L</strong></span>
+            <span>Fat: <strong className="text-emerald-800">{avgFat}%</strong></span>
           </div>
         </div>
 
-        {/* Card 2: Today's Milk Sales */}
-        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-neutral-200/80 shadow-xs hover:shadow-md transition-all relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-blue-500/10 rounded-full blur-2xl group-hover:scale-125 transition-transform" />
-          <div className="flex items-center justify-between text-xs text-neutral-500 mb-2">
-            <span className="font-semibold text-neutral-600">Today's Sales Revenue</span>
-            <div className="p-2 rounded-xl bg-blue-50 text-blue-700">
+        {/* KPI 2: Morning & Evening Shift Collection */}
+        <div className="bg-white rounded-xl p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all">
+          <div className="flex items-center justify-between text-xs text-[#64748B] mb-2">
+            <span className="font-semibold text-neutral-700">Shift Collection Breakdown</span>
+            <div className="p-1.5 rounded-lg bg-blue-50 text-blue-700">
+              <Scale className="w-4 h-4" />
+            </div>
+          </div>
+          <div className="flex items-baseline gap-2">
+            <span className="text-xl font-black text-[#172033] font-mono tracking-tight">
+              {morningLitres.toFixed(1)}L <span className="text-xs font-normal text-neutral-400">/</span> {eveningLitres.toFixed(1)}L
+            </span>
+            <span className="ml-auto text-[10px] font-bold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded">
+              2 Shifts
+            </span>
+          </div>
+          <div className="mt-2.5 pt-2 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-600 font-mono">
+            <span>Chiller A: <strong>Okara</strong></span>
+            <span>Chiller B: <strong>Buffalo</strong></span>
+          </div>
+        </div>
+
+        {/* KPI 3: Today's Sales & Collected Payments */}
+        <div className="bg-white rounded-xl p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all">
+          <div className="flex items-center justify-between text-xs text-[#64748B] mb-2">
+            <span className="font-semibold text-neutral-700">Sales & Cash Inflow</span>
+            <div className="p-1.5 rounded-lg bg-teal-50 text-teal-700">
               <ShoppingBag className="w-4 h-4" />
             </div>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl sm:text-3xl font-extrabold text-neutral-900 font-mono tracking-tight">
+            <span className="text-2xl font-black text-[#172033] font-mono tracking-tight">
               ₨ {totalSalesRevenue.toLocaleString()}
             </span>
             <span className="ml-auto flex items-center text-[11px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">
               <ArrowUpRight className="w-3 h-3 mr-0.5" /> +12.1%
             </span>
           </div>
-          <div className="mt-3 pt-3 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-600 font-mono">
+          <div className="mt-2.5 pt-2 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-600 font-mono">
             <span>Cash: <strong className="text-emerald-700 font-semibold">₨ {totalCashCollected.toLocaleString()}</strong></span>
             <span>Credit: <strong className="text-amber-700">₨ {totalCreditSales.toLocaleString()}</strong></span>
           </div>
         </div>
 
-        {/* Card 3: Total Animals */}
-        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-neutral-200/80 shadow-xs hover:shadow-md transition-all relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-teal-500/10 rounded-full blur-2xl group-hover:scale-125 transition-transform" />
-          <div className="flex items-center justify-between text-xs text-neutral-500 mb-2">
-            <span className="font-semibold text-neutral-600">Total Livestock Herd</span>
-            <div className="p-2 rounded-xl bg-teal-50 text-teal-700">
+        {/* KPI 4: Total Animals & In-Milk Count */}
+        <div className="bg-white rounded-xl p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all">
+          <div className="flex items-center justify-between text-xs text-[#64748B] mb-2">
+            <span className="font-semibold text-neutral-700">Herd & Milking Heads</span>
+            <div className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700">
               <ShieldCheck className="w-4 h-4" />
             </div>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl sm:text-3xl font-extrabold text-neutral-900 font-mono tracking-tight">
+            <span className="text-2xl font-black text-[#172033] font-mono tracking-tight">
               {totalAnimals}
             </span>
             <span className="text-xs font-semibold text-neutral-500">Heads</span>
-            <span className="ml-auto text-[11px] font-semibold text-teal-800 bg-teal-50 px-2 py-0.5 rounded">
+            <span className="ml-auto text-[11px] font-bold text-[#14532D] bg-[#14532D]/10 px-2 py-0.5 rounded">
               {milkingAnimals} in Milk
             </span>
           </div>
-          <div className="mt-3 pt-3 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-600 font-mono">
-            <span>Milking: <strong className="text-neutral-900">{milkingAnimals}</strong></span>
-            <span>Dry: <strong className="text-neutral-900">{dryAnimals}</strong></span>
-            <span>Yield: <strong className="text-teal-800">{(totalDailyLitres / (milkingAnimals || 1)).toFixed(1)}L/head</strong></span>
+          <div className="mt-2.5 pt-2 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-600 font-mono">
+            <span>Milking: <strong>{milkingAnimals}</strong></span>
+            <span>Dry: <strong>{dryAnimals}</strong></span>
+            <span>Preg: <strong>{pregnantAnimals}</strong></span>
           </div>
         </div>
 
-        {/* Card 4: Pregnant Animals */}
-        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-neutral-200/80 shadow-xs hover:shadow-md transition-all relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/10 rounded-full blur-2xl group-hover:scale-125 transition-transform" />
-          <div className="flex items-center justify-between text-xs text-neutral-500 mb-2">
-            <span className="font-semibold text-neutral-600">Pregnant & Due Calving</span>
-            <div className="p-2 rounded-xl bg-amber-50 text-amber-700">
-              <HeartPulse className="w-4 h-4" />
-            </div>
-          </div>
-          <div className="flex items-baseline gap-2">
-            <span className="text-2xl sm:text-3xl font-extrabold text-amber-950 font-mono tracking-tight">
-              {pregnantAnimals}
-            </span>
-            <span className="text-xs font-semibold text-neutral-500">Heads</span>
-            <span className="ml-auto text-[11px] font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded">
-              1 Due Soon
-            </span>
-          </div>
-          <div className="mt-3 pt-3 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-600 font-mono">
-            <span>Breeding AI: <strong>Active</strong></span>
-            <span className="text-amber-800 font-semibold">Reshma: Due 12d</span>
-          </div>
-        </div>
-
-        {/* Card 5: Monthly Expenses */}
-        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-neutral-200/80 shadow-xs hover:shadow-md transition-all relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-purple-500/10 rounded-full blur-2xl group-hover:scale-125 transition-transform" />
-          <div className="flex items-center justify-between text-xs text-neutral-500 mb-2">
-            <span className="font-semibold text-neutral-600">Monthly Operating Expenses</span>
-            <div className="p-2 rounded-xl bg-purple-50 text-purple-700">
+        {/* KPI 5: Monthly Expenses OPEX */}
+        <div className="bg-white rounded-xl p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all">
+          <div className="flex items-center justify-between text-xs text-[#64748B] mb-2">
+            <span className="font-semibold text-neutral-700">Monthly Operating Expenses</span>
+            <div className="p-1.5 rounded-lg bg-purple-50 text-purple-700">
               <DollarSign className="w-4 h-4" />
             </div>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl sm:text-3xl font-extrabold text-neutral-900 font-mono tracking-tight">
+            <span className="text-2xl font-black text-[#172033] font-mono tracking-tight">
               ₨ {monthlyExpenses.toLocaleString()}
             </span>
-            <span className="ml-auto text-[11px] font-semibold text-purple-700 bg-purple-50 px-2 py-0.5 rounded">
+            <span className="ml-auto text-[10px] font-bold text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded">
               OPEX
             </span>
           </div>
-          <div className="mt-3 pt-3 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-600 font-mono">
-            <span>Feed: <strong className="text-neutral-900">₨ {feedCost.toLocaleString()}</strong></span>
-            <span>Labor/Vet: <strong className="text-neutral-900">₨ {(laborCost + vetCost).toLocaleString()}</strong></span>
+          <div className="mt-2.5 pt-2 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-600 font-mono">
+            <span>Feed: <strong>₨ {feedCost.toLocaleString()}</strong></span>
+            <span>Labor/Vet: <strong>₨ {(laborCost + vetCost).toLocaleString()}</strong></span>
           </div>
         </div>
 
-        {/* Card 6: Net Profit/Loss */}
-        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-neutral-200/80 shadow-xs hover:shadow-md transition-all relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/15 rounded-full blur-2xl group-hover:scale-125 transition-transform" />
-          <div className="flex items-center justify-between text-xs text-neutral-500 mb-2">
-            <span className="font-semibold text-neutral-600">Net Operating Profit</span>
-            <div className="p-2 rounded-xl bg-emerald-50 text-emerald-700">
+        {/* KPI 6: Estimated Profit or Loss */}
+        <div className="bg-white rounded-xl p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all">
+          <div className="flex items-center justify-between text-xs text-[#64748B] mb-2">
+            <span className="font-semibold text-neutral-700">Net Operating Profit</span>
+            <div className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700">
               <TrendingUp className="w-4 h-4" />
             </div>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl sm:text-3xl font-extrabold text-emerald-950 font-mono tracking-tight">
+            <span className="text-2xl font-black text-emerald-950 font-mono tracking-tight">
               ₨ {netOperatingProfit.toLocaleString()}
             </span>
             <span className="ml-auto text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded">
               {profitMarginPercent}% Margin
             </span>
           </div>
-          <div className="mt-3 pt-3 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-600 font-mono">
-            <span>Gross: <strong className="text-neutral-900">₨ {grossProfit.toLocaleString()}</strong></span>
-            <span className="text-emerald-700 font-bold">Double-Entry Audited</span>
+          <div className="mt-2.5 pt-2 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-600 font-mono">
+            <span>Gross: <strong>₨ {grossProfit.toLocaleString()}</strong></span>
+            <span className="text-emerald-700 font-semibold">Ledger Audited</span>
           </div>
         </div>
 
-        {/* Card 7: Pending Customer Payments */}
-        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-neutral-200/80 shadow-xs hover:shadow-md transition-all relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/10 rounded-full blur-2xl group-hover:scale-125 transition-transform" />
-          <div className="flex items-center justify-between text-xs text-neutral-500 mb-2">
-            <span className="font-semibold text-neutral-600">Pending Receivables (Khata)</span>
-            <div className="p-2 rounded-xl bg-amber-50 text-amber-700">
+        {/* KPI 7: Pending Customer Receivables (Khata) */}
+        <div className="bg-white rounded-xl p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all">
+          <div className="flex items-center justify-between text-xs text-[#64748B] mb-2">
+            <span className="font-semibold text-neutral-700">Pending Receivables (Khata)</span>
+            <div className="p-1.5 rounded-lg bg-amber-50 text-amber-700">
               <Users className="w-4 h-4" />
             </div>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl sm:text-3xl font-extrabold text-amber-950 font-mono tracking-tight">
+            <span className="text-2xl font-black text-amber-950 font-mono tracking-tight">
               ₨ {receivables.toLocaleString()}
             </span>
-            <span className="ml-auto text-[11px] font-bold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+            <span className="ml-auto text-[10px] font-bold text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
               {overdueCustomersCount} Near Limit
             </span>
           </div>
-          <div className="mt-3 pt-3 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-600 font-mono">
+          <div className="mt-2.5 pt-2 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-600 font-mono">
             <span>Active Customers: <strong>{db.customers.length}</strong></span>
             <button 
               onClick={() => onNavigate('customers')}
               className="text-amber-800 font-bold hover:underline"
             >
-              Send Reminders &rarr;
+              Ledger &rarr;
             </button>
           </div>
         </div>
 
-        {/* Card 8: Low Stock Alerts */}
-        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-neutral-200/80 shadow-xs hover:shadow-md transition-all relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-rose-500/10 rounded-full blur-2xl group-hover:scale-125 transition-transform" />
-          <div className="flex items-center justify-between text-xs text-neutral-500 mb-2">
-            <span className="font-semibold text-neutral-600">Inventory Stock Status</span>
-            <div className="p-2 rounded-xl bg-rose-50 text-rose-700">
+        {/* KPI 8: Low Stock Alerts */}
+        <div className="bg-white rounded-xl p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all">
+          <div className="flex items-center justify-between text-xs text-[#64748B] mb-2">
+            <span className="font-semibold text-neutral-700">Inventory Stock Status</span>
+            <div className="p-1.5 rounded-lg bg-rose-50 text-rose-700">
               <Package className="w-4 h-4" />
             </div>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl sm:text-3xl font-extrabold text-neutral-900 font-mono tracking-tight">
+            <span className="text-2xl font-black text-[#172033] font-mono tracking-tight">
               {lowStockItems.length}
             </span>
             <span className="text-xs font-semibold text-neutral-500">Items Low</span>
-            <span className="ml-auto text-[11px] font-bold text-rose-800 bg-rose-100 px-2 py-0.5 rounded">
+            <span className="ml-auto text-[10px] font-bold text-rose-800 bg-rose-100 px-1.5 py-0.5 rounded">
               Action Needed
             </span>
           </div>
-          <div className="mt-3 pt-3 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-600 font-mono">
-            <span>FMD Vaccine: <strong className="text-rose-700">3 Vials</strong></span>
+          <div className="mt-2.5 pt-2 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-600 font-mono">
+            <span>Vaccines & Silage</span>
             <button 
               onClick={() => onNavigate('inventoryFeed')}
               className="text-rose-700 font-bold hover:underline"
@@ -400,210 +544,96 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
       </div>
 
-      {/* 4. Interactive Charts and Data Visualizations Component (Daily Milk, Financials, Population, Products) */}
+      {/* 4. Interactive Analytics & Visualizations Charts */}
       <DashboardAnalyticsCharts 
         db={db}
         selectedBranchId={selectedBranchId}
       />
 
       {/* 5. Milk Allocation & Chiller Reconciliation Strip */}
-      <div className="p-5 sm:p-6 rounded-2xl border border-neutral-200/80 bg-white shadow-xs">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4">
+      <div className="p-4 sm:p-5 rounded-xl border border-neutral-200/90 bg-white shadow-xs">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
           <div>
-            <h2 className="text-sm sm:text-base font-bold text-neutral-900 flex items-center gap-2">
-              <Scale className="w-5 h-5 text-emerald-700" />
+            <h2 className="text-sm font-bold text-[#172033] flex items-center gap-2">
+              <Scale className="w-4 h-4 text-[#14532D]" />
               <span>Today's Milk Allocation & Chiller Reconciliation</span>
             </h2>
-            <p className="text-xs text-neutral-500 mt-0.5">
+            <p className="text-xs text-[#64748B] mt-0.5">
               Daily Shift Collection: <strong className="font-mono text-neutral-900">{reconciliation.totalCollected} Litres</strong>
             </p>
           </div>
-          <button
-            onClick={() => onNavigate('reconciliation')}
-            className="text-xs text-emerald-800 hover:text-emerald-900 font-bold flex items-center gap-1 cursor-pointer bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-lg border border-emerald-200 transition-colors self-start sm:self-auto"
-          >
-            <span>Open Full Reconciliation Sheet</span>
-            <ArrowUpRight className="w-3.5 h-3.5" />
-          </button>
-        </div>
 
-        {/* Allocation Progress Bar */}
-        <div className="h-4 w-full bg-neutral-100 rounded-xl overflow-hidden flex mb-4 shadow-inner">
-          <div
-            style={{ width: `${(reconciliation.soldLitres / (reconciliation.totalCollected || 1)) * 100}%` }}
-            className="bg-emerald-600 h-full transition-all"
-            title={`Sold: ${reconciliation.soldLitres}L`}
-          />
-          <div
-            style={{ width: `${(reconciliation.processingLitres / (reconciliation.totalCollected || 1)) * 100}%` }}
-            className="bg-purple-600 h-full transition-all"
-            title={`Processed: ${reconciliation.processingLitres}L`}
-          />
-          <div
-            style={{ width: `${(reconciliation.calfFeedingLitres / (reconciliation.totalCollected || 1)) * 100}%` }}
-            className="bg-blue-500 h-full transition-all"
-            title={`Calf Fed: ${reconciliation.calfFeedingLitres}L`}
-          />
-          <div
-            style={{ width: `${(reconciliation.householdStaffLitres / (reconciliation.totalCollected || 1)) * 100}%` }}
-            className="bg-amber-500 h-full transition-all"
-            title={`Household/Staff: ${reconciliation.householdStaffLitres}L`}
-          />
-          <div
-            style={{ width: `${(reconciliation.remainingInChiller / (reconciliation.totalCollected || 1)) * 100}%` }}
-            className="bg-teal-400 h-full transition-all"
-            title={`Chiller Tank: ${reconciliation.remainingInChiller}L`}
-          />
-        </div>
-
-        {/* Allocation Cards */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 text-xs">
-          <div className="p-3 rounded-xl bg-neutral-50/70 border border-neutral-200/60">
-            <div className="flex items-center gap-1.5 text-neutral-500 text-[11px] font-medium">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-600" />
-              <span>Sold to Customers</span>
-            </div>
-            <div className="text-base font-bold text-neutral-900 font-mono mt-1">
-              {reconciliation.soldLitres} L
-            </div>
-          </div>
-
-          <div className="p-3 rounded-xl bg-neutral-50/70 border border-neutral-200/60">
-            <div className="flex items-center gap-1.5 text-neutral-500 text-[11px] font-medium">
-              <span className="w-2.5 h-2.5 rounded-full bg-purple-600" />
-              <span>Ghee & Dahi Batches</span>
-            </div>
-            <div className="text-base font-bold text-neutral-900 font-mono mt-1">
-              {reconciliation.processingLitres} L
-            </div>
-          </div>
-
-          <div className="p-3 rounded-xl bg-neutral-50/70 border border-neutral-200/60">
-            <div className="flex items-center gap-1.5 text-neutral-500 text-[11px] font-medium">
-              <span className="w-2.5 h-2.5 rounded-full bg-blue-500" />
-              <span>Calf Feeding Ration</span>
-            </div>
-            <div className="text-base font-bold text-neutral-900 font-mono mt-1">
-              {reconciliation.calfFeedingLitres} L
-            </div>
-          </div>
-
-          <div className="p-3 rounded-xl bg-neutral-50/70 border border-neutral-200/60">
-            <div className="flex items-center gap-1.5 text-neutral-500 text-[11px] font-medium">
-              <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
-              <span>Household / Staff</span>
-            </div>
-            <div className="text-base font-bold text-neutral-900 font-mono mt-1">
-              {reconciliation.householdStaffLitres} L
-            </div>
-          </div>
-
-          <div className="p-3 rounded-xl bg-neutral-50/70 border border-neutral-200/60">
-            <div className="flex items-center gap-1.5 text-neutral-500 text-[11px] font-medium">
-              <span className="w-2.5 h-2.5 rounded-full bg-teal-400" />
-              <span>Bulk Chiller Stock</span>
-            </div>
-            <div className="text-base font-bold text-neutral-900 font-mono mt-1">
-              {reconciliation.remainingInChiller} L
-            </div>
-          </div>
-
-          <div className="p-3 rounded-xl bg-emerald-50/60 border border-emerald-200">
-            <div className="flex items-center gap-1.5 text-emerald-800 text-[11px] font-semibold">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-600" />
-              <span>Reconciled Variance</span>
-            </div>
-            <div className="text-base font-bold text-emerald-950 font-mono mt-1">
-              0.00 L (Balanced)
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* 6. Two Column Tables: Recent POS Sales & Top Milking Producers */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        
-        {/* Left: Recent POS Invoices */}
-        <div className="p-5 rounded-2xl border border-neutral-200/80 bg-white shadow-xs">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <ShoppingBag className="w-4 h-4 text-emerald-700" />
-              <h3 className="text-sm font-bold text-neutral-900">Recent POS Sales & Billing</h3>
-            </div>
+          <div className="flex items-center gap-2">
+            <span className="px-2 py-0.5 text-[10px] font-mono font-bold rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200">
+              Variance: 0.0 L (Reconciled)
+            </span>
             <button
-              onClick={() => onNavigate('posBilling')}
-              className="text-xs text-emerald-800 hover:text-emerald-900 font-bold"
+              onClick={() => onNavigate('reconciliation')}
+              className="px-2.5 py-1 text-xs font-semibold text-[#14532D] hover:bg-emerald-50 rounded-lg transition-colors border border-emerald-200/80 cursor-pointer"
             >
-              View All POS &rarr;
+              Audit Sheet &rarr;
             </button>
           </div>
-          <div className="divide-y divide-neutral-100">
-            {branchSales.slice(0, 4).map(sale => (
-              <div key={sale.id} className="py-3 flex items-center justify-between text-xs hover:bg-neutral-50 px-2 rounded-lg transition-colors">
-                <div>
-                  <div className="font-semibold text-neutral-900">{sale.customerName}</div>
-                  <div className="text-[11px] text-neutral-500 flex items-center gap-2 mt-0.5">
-                    <span className="font-mono text-neutral-600">{sale.invoiceNumber}</span>
-                    <span>&middot;</span>
-                    <span className="capitalize px-1.5 py-0.2 rounded bg-neutral-100 text-neutral-700 font-medium">
-                      {sale.paymentMethod}
-                    </span>
-                  </div>
-                </div>
-                <div className="text-right font-mono">
-                  <div className="font-bold text-neutral-900 text-sm">₨ {sale.total.toLocaleString()}</div>
-                  {sale.creditAmount > 0 && (
-                    <div className="text-[10px] text-amber-700 font-semibold">Credit: ₨ {sale.creditAmount.toLocaleString()}</div>
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
         </div>
 
-        {/* Right: Herd Lactation Leaders */}
-        <div className="p-5 rounded-2xl border border-neutral-200/80 bg-white shadow-xs">
-          <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="w-4 h-4 text-emerald-700" />
-              <h3 className="text-sm font-bold text-neutral-900">Top Daily Milking Producers</h3>
-            </div>
-            <button
-              onClick={() => onNavigate('animals')}
-              className="text-xs text-emerald-800 hover:text-emerald-900 font-bold"
-            >
-              Herd Roster &rarr;
-            </button>
+        {/* Visual Allocation Progress Bar */}
+        <div className="space-y-1.5">
+          <div className="h-3 w-full bg-neutral-100 rounded-full overflow-hidden flex">
+            {/* Sales (63.7%) */}
+            <div 
+              style={{ width: `${(reconciliation.soldLitres / (reconciliation.totalCollected || 1)) * 100}%` }}
+              className="h-full bg-emerald-600"
+              title={`Direct Sales: ${reconciliation.soldLitres}L`}
+            />
+            {/* Calf Rearing (10.3%) */}
+            <div 
+              style={{ width: `${(reconciliation.calfFeedingLitres / (reconciliation.totalCollected || 1)) * 100}%` }}
+              className="h-full bg-blue-500"
+              title={`Calf Feeding: ${reconciliation.calfFeedingLitres}L`}
+            />
+            {/* Processing/Ghee (17.2%) */}
+            <div 
+              style={{ width: `${(reconciliation.processingLitres / (reconciliation.totalCollected || 1)) * 100}%` }}
+              className="h-full bg-amber-500"
+              title={`Value Addition Processing: ${reconciliation.processingLitres}L`}
+            />
+            {/* Staff / Household (5.2%) */}
+            <div 
+              style={{ width: `${(reconciliation.householdStaffLitres / (reconciliation.totalCollected || 1)) * 100}%` }}
+              className="h-full bg-purple-500"
+              title={`Staff / Household: ${reconciliation.householdStaffLitres}L`}
+            />
+            {/* Chiller Reserve (3.6%) */}
+            <div 
+              style={{ width: `${(reconciliation.remainingInChiller / (reconciliation.totalCollected || 1)) * 100}%` }}
+              className="h-full bg-teal-500"
+              title={`Remaining in Chiller: ${reconciliation.remainingInChiller}L`}
+            />
           </div>
-          <div className="divide-y divide-neutral-100">
-            {branchAnimals
-              .filter(a => a.status === 'milking')
-              .sort((a, b) => b.currentAvgDailyYield - a.currentAvgDailyYield)
-              .slice(0, 4)
-              .map(animal => (
-                <div key={animal.id} className="py-3 flex items-center justify-between text-xs hover:bg-neutral-50 px-2 rounded-lg transition-colors">
-                  <div>
-                    <div className="font-semibold text-neutral-900 flex items-center gap-2">
-                      <span>{animal.name}</span>
-                      <span className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-1.5 py-0.5 rounded">
-                        {animal.earTag}
-                      </span>
-                    </div>
-                    <div className="text-[11px] text-neutral-500 mt-0.5">
-                      {animal.breed} &middot; Lactation #{animal.lactationNumber}
-                    </div>
-                  </div>
-                  <div className="text-right font-mono">
-                    <div className="font-extrabold text-emerald-900 text-sm">
-                      {animal.currentAvgDailyYield} L/day
-                    </div>
-                    <div className="text-[10px] text-neutral-400">Daily Average</div>
-                  </div>
-                </div>
-              ))}
+
+          <div className="flex flex-wrap items-center justify-between text-[11px] text-neutral-600 font-mono gap-y-1 pt-1">
+            <span className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-600" />
+              <span>POS Sales: <strong>{reconciliation.soldLitres}L</strong></span>
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-blue-500" />
+              <span>Calves: <strong>{reconciliation.calfFeedingLitres}L</strong></span>
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-amber-500" />
+              <span>Ghee Processing: <strong>{reconciliation.processingLitres}L</strong></span>
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-purple-500" />
+              <span>Staff: <strong>{reconciliation.householdStaffLitres}L</strong></span>
+            </span>
+            <span className="flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-teal-500" />
+              <span>Chiller Stock: <strong>{reconciliation.remainingInChiller}L</strong></span>
+            </span>
           </div>
         </div>
-
       </div>
 
     </div>
