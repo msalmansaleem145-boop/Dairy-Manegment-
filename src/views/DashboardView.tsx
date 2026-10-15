@@ -22,11 +22,16 @@ import {
   Layers,
   Activity,
   Syringe,
-  ChevronRight
+  ChevronRight,
+  Sun,
+  Moon,
+  PlusCircle,
+  FileText
 } from 'lucide-react';
 import { AppDatabase } from '../services/storage';
 import { Language, translations } from '../i18n/translations';
 import { DashboardAnalyticsCharts } from '../components/DashboardAnalyticsCharts';
+import { AskLogo } from '../components/AskLogo';
 
 interface DashboardViewProps {
   db: AppDatabase;
@@ -136,52 +141,231 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
     status: 'balanced'
   };
 
+  // Time-of-day greeting
+  const currentHour = new Date().getHours();
+  const greeting = currentHour < 12 
+    ? (lang === 'ur' ? 'صبح بخیر، سلمان سلیم' : 'Good Morning, Salman Saleem')
+    : currentHour < 17 
+    ? (lang === 'ur' ? 'دوپہر بخیر، سلمان سلیم' : 'Good Afternoon, Salman Saleem')
+    : (lang === 'ur' ? 'شام بخیر، سلمان سلیم' : 'Good Evening, Salman Saleem');
+
+  const shiftStatusText = currentHour < 14
+    ? (lang === 'ur' ? 'صبح کی شفٹ فعال (06:00 - 14:00)' : 'Morning Shift Active (06:00 - 14:00)')
+    : (lang === 'ur' ? 'شام کی شفٹ فعال (14:00 - 22:00)' : 'Evening Shift Active (14:00 - 22:00)');
+
+  // Recent transactions for activity feed
+  const recentSales = branchSales.slice(-4).reverse();
+  const recentMilk = todayRecords.slice(-4).reverse();
+
   return (
-    <div className="space-y-5 max-w-7xl mx-auto">
+    <div className="space-y-6 max-w-7xl mx-auto">
       
-      {/* 1. Header Banner & Quick Actions Strip */}
-      <div className="bg-white p-4 sm:p-5 rounded-xl border border-neutral-200/90 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-lg sm:text-xl font-extrabold tracking-tight text-[#172033]">
-              {t.dashboard}
-            </h1>
-            <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-[#14532D]/10 text-[#14532D] border border-[#14532D]/20">
-              Live ERP
-            </span>
+      {/* 1. Hero / Welcome Banner with Dairy-Themed Gradient & Quick Metrics */}
+      <div className="relative rounded-2xl bg-gradient-to-br from-[#14532D] via-[#166534] to-[#0A2E1A] text-white p-5 sm:p-7 shadow-sm border border-emerald-900/60 overflow-hidden">
+        
+        {/* Subtle Decorative Pattern Background */}
+        <div className="absolute inset-0 opacity-10 bg-[radial-gradient(#FFFFFF_1px,transparent_1px)] [background-size:16px_16px] pointer-events-none" />
+        <div className="absolute -right-16 -top-16 w-64 h-64 bg-[#E5C77E]/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          
+          {/* Left Greeting & Status with Branded ASK Monogram */}
+          <div className="flex items-start gap-4">
+            <div className="hidden sm:flex shrink-0 pt-1">
+              <AskLogo variant="mark" size="md" theme="dark" className="drop-shadow-md" />
+            </div>
+            <div className="space-y-2 max-w-2xl">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-white/15 backdrop-blur-xs text-[#E5C77E] border border-white/20">
+                  {currentHour < 14 ? (
+                    <Sun className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
+                  ) : (
+                    <Moon className="w-3.5 h-3.5 text-indigo-200" />
+                  )}
+                  <span>{shiftStatusText}</span>
+                </span>
+
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-mono text-emerald-200 bg-black/20 border border-white/10">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                  <span>Chiller: 3.8°C (Optimal)</span>
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2.5">
+                <div className="sm:hidden shrink-0">
+                  <AskLogo variant="mark" size="xs" theme="dark" />
+                </div>
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-extrabold tracking-tight text-white font-sans">
+                  {greeting}
+                </h1>
+              </div>
+
+            <p className="text-xs sm:text-sm text-emerald-100/90 leading-relaxed">
+              {lang === 'ur'
+                ? 'ڈیری فارم کے تمام امور، دودھ کی ترسیل، مویشیوں کی صحت اور پی او ایس اکاؤنٹس کا مکمل جائزہ۔'
+                : 'Real-time dairy farm metrics, shift milk production, herd registry health, and POS financial ledgers.'}
+            </p>
+
+              {/* Quick Metrics Strip */}
+              <div className="pt-2 flex flex-wrap items-center gap-4 text-xs font-mono text-emerald-100/90">
+                <span className="flex items-center gap-1.5">
+                  <Milk className="w-3.5 h-3.5 text-[#E5C77E]" />
+                  <span>Yield: <strong className="text-white">{totalDailyLitres.toFixed(1)} L</strong></span>
+                </span>
+                <span className="text-white/30">·</span>
+                <span className="flex items-center gap-1.5">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-300" />
+                  <span>Milking: <strong className="text-white">{milkingAnimals}/{totalAnimals} Heads</strong></span>
+                </span>
+                <span className="text-white/30">·</span>
+                <span className="flex items-center gap-1.5">
+                  <ShoppingBag className="w-3.5 h-3.5 text-amber-300" />
+                  <span>Sales: <strong className="text-white">₨ {totalSalesRevenue.toLocaleString()}</strong></span>
+                </span>
+              </div>
+            </div>
           </div>
-          <p className="text-xs text-[#64748B] mt-0.5">
-            Real-time dairy metrics, shift milk production, herd health, and POS financial accounting
-          </p>
+
+          {/* Right Action Buttons */}
+          <div className="flex flex-wrap sm:flex-nowrap lg:flex-col gap-2.5 shrink-0">
+            <button
+              onClick={() => onNavigate('milkProduction')}
+              className="flex-1 sm:flex-none px-4 py-2.5 bg-gradient-to-r from-[#E5C77E] to-[#C7A45D] hover:from-[#F3DC9B] hover:to-[#D4B36A] text-[#143929] rounded-xl text-xs font-black flex items-center justify-center gap-2 shadow-sm transition-all cursor-pointer active:scale-95"
+            >
+              <Milk className="w-4 h-4 stroke-[2.5]" />
+              <span>Record Milk Shift</span>
+            </button>
+
+            <button
+              onClick={() => onNavigate('posBilling')}
+              className="flex-1 sm:flex-none px-4 py-2.5 bg-white/10 hover:bg-white/20 border border-white/20 text-white rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer"
+            >
+              <ShoppingBag className="w-4 h-4 text-[#E5C77E]" />
+              <span>Open POS Counter</span>
+            </button>
+          </div>
+
+        </div>
+      </div>
+
+      {/* 2. One-Tap Quick Action Hub */}
+      <div className="bg-white p-3.5 sm:p-4 rounded-2xl border border-neutral-200/90 shadow-2xs">
+        <div className="flex items-center justify-between mb-3 px-1">
+          <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-500 flex items-center gap-1.5">
+            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+            <span>Farm Operations & Quick Entry Hub</span>
+          </span>
+          <span className="text-[10px] text-neutral-400 font-mono">
+            Direct Shortcuts
+          </span>
         </div>
 
-        {/* The 3 Core Quick Action Buttons */}
-        <div className="flex items-center flex-wrap gap-2">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+          {/* Shortcut 1: Milk Shift */}
           <button
             onClick={() => onNavigate('milkProduction')}
-            className="px-3.5 py-1.5 bg-[#14532D] hover:bg-[#0f4022] text-white rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
+            className="p-3 rounded-xl bg-emerald-50/70 hover:bg-emerald-100/80 border border-emerald-200/80 text-left transition-all cursor-pointer group flex flex-col justify-between"
           >
-            <Milk className="w-3.5 h-3.5 text-emerald-300" />
-            <span>Record Milk Shift</span>
+            <div className="flex items-center justify-between">
+              <div className="p-2 rounded-lg bg-emerald-600 text-white group-hover:scale-105 transition-transform">
+                <Milk className="w-4 h-4" />
+              </div>
+              <ChevronRight className="w-3.5 h-3.5 text-emerald-700 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </div>
+            <div className="mt-2.5">
+              <div className="text-xs font-bold text-emerald-950">Record Milk</div>
+              <div className="text-[10px] text-emerald-700">Morning / Eve Shift</div>
+            </div>
           </button>
-          <button
-            onClick={() => onNavigate('posBilling')}
-            className="px-3.5 py-1.5 bg-[#172033] hover:bg-neutral-800 text-white rounded-lg text-xs font-bold flex items-center gap-1.5 cursor-pointer shadow-xs transition-colors"
-          >
-            <ShoppingBag className="w-3.5 h-3.5 text-amber-300" />
-            <span>Open POS Counter</span>
-          </button>
+
+          {/* Shortcut 2: Animal Registry */}
           <button
             onClick={() => onNavigate('animals')}
-            className="px-3 py-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-800 rounded-lg text-xs font-semibold flex items-center gap-1.5 cursor-pointer transition-colors border border-neutral-200"
+            className="p-3 rounded-xl bg-teal-50/70 hover:bg-teal-100/80 border border-teal-200/80 text-left transition-all cursor-pointer group flex flex-col justify-between"
           >
-            <ShieldCheck className="w-3.5 h-3.5 text-neutral-600" />
-            <span>Herd Registry</span>
+            <div className="flex items-center justify-between">
+              <div className="p-2 rounded-lg bg-[#14532D] text-white group-hover:scale-105 transition-transform">
+                <ShieldCheck className="w-4 h-4" />
+              </div>
+              <ChevronRight className="w-3.5 h-3.5 text-teal-700 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </div>
+            <div className="mt-2.5">
+              <div className="text-xs font-bold text-neutral-900">New Cattle</div>
+              <div className="text-[10px] text-teal-700">Tag & Pedigree</div>
+            </div>
+          </button>
+
+          {/* Shortcut 3: POS Billing */}
+          <button
+            onClick={() => onNavigate('posBilling')}
+            className="p-3 rounded-xl bg-amber-50/70 hover:bg-amber-100/80 border border-amber-200/80 text-left transition-all cursor-pointer group flex flex-col justify-between"
+          >
+            <div className="flex items-center justify-between">
+              <div className="p-2 rounded-lg bg-amber-600 text-white group-hover:scale-105 transition-transform">
+                <ShoppingBag className="w-4 h-4" />
+              </div>
+              <ChevronRight className="w-3.5 h-3.5 text-amber-700 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </div>
+            <div className="mt-2.5">
+              <div className="text-xs font-bold text-neutral-900">POS Billing</div>
+              <div className="text-[10px] text-amber-800">Direct Cash/Credit</div>
+            </div>
+          </button>
+
+          {/* Shortcut 4: Vet & Breeding */}
+          <button
+            onClick={() => onNavigate('vetBreeding')}
+            className="p-3 rounded-xl bg-blue-50/70 hover:bg-blue-100/80 border border-blue-200/80 text-left transition-all cursor-pointer group flex flex-col justify-between"
+          >
+            <div className="flex items-center justify-between">
+              <div className="p-2 rounded-lg bg-blue-600 text-white group-hover:scale-105 transition-transform">
+                <HeartPulse className="w-4 h-4" />
+              </div>
+              <ChevronRight className="w-3.5 h-3.5 text-blue-700 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </div>
+            <div className="mt-2.5">
+              <div className="text-xs font-bold text-neutral-900">Vet & Health</div>
+              <div className="text-[10px] text-blue-700">DVM Log & Vaccine</div>
+            </div>
+          </button>
+
+          {/* Shortcut 5: Inventory & Feed */}
+          <button
+            onClick={() => onNavigate('inventoryFeed')}
+            className="p-3 rounded-xl bg-purple-50/70 hover:bg-purple-100/80 border border-purple-200/80 text-left transition-all cursor-pointer group flex flex-col justify-between"
+          >
+            <div className="flex items-center justify-between">
+              <div className="p-2 rounded-lg bg-purple-600 text-white group-hover:scale-105 transition-transform">
+                <Package className="w-4 h-4" />
+              </div>
+              <ChevronRight className="w-3.5 h-3.5 text-purple-700 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </div>
+            <div className="mt-2.5">
+              <div className="text-xs font-bold text-neutral-900">Stock & Feed</div>
+              <div className="text-[10px] text-purple-700">Silage & Wanda PO</div>
+            </div>
+          </button>
+
+          {/* Shortcut 6: Khata Ledger */}
+          <button
+            onClick={() => onNavigate('customers')}
+            className="p-3 rounded-xl bg-rose-50/70 hover:bg-rose-100/80 border border-rose-200/80 text-left transition-all cursor-pointer group flex flex-col justify-between"
+          >
+            <div className="flex items-center justify-between">
+              <div className="p-2 rounded-lg bg-rose-600 text-white group-hover:scale-105 transition-transform">
+                <Users className="w-4 h-4" />
+              </div>
+              <ChevronRight className="w-3.5 h-3.5 text-rose-700 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </div>
+            <div className="mt-2.5">
+              <div className="text-xs font-bold text-neutral-900">Khata Ledger</div>
+              <div className="text-[10px] text-rose-700">Customer Credit</div>
+            </div>
           </button>
         </div>
       </div>
 
-      {/* 2. Farm Alerts & Operational Notices Section (Real DB Records & Working Navigation) */}
+      {/* 3. Farm Alerts & Operational Notices Section (Real DB Records & Working Navigation) */}
       <div className="space-y-2">
         <div className="flex items-center justify-between px-1">
           <span className="text-[11px] font-bold uppercase tracking-wider text-[#64748B] flex items-center gap-1.5">
@@ -198,17 +382,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           {/* Alert 1: Expected Calving Alert */}
           <div 
             onClick={() => onNavigate('vetBreeding')}
-            className="p-3.5 rounded-xl border border-amber-200/90 bg-amber-50/50 hover:bg-amber-50 transition-colors cursor-pointer group shadow-2xs"
+            className="p-3.5 rounded-xl border border-amber-200/90 bg-amber-50/60 hover:bg-amber-100/70 transition-colors cursor-pointer group shadow-2xs"
           >
             <div className="flex items-start justify-between gap-2">
               <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-amber-100 text-amber-900 shrink-0">
+                <div className="p-2 rounded-lg bg-amber-100 text-amber-900 shrink-0">
                   <Calendar className="w-4 h-4 text-amber-800" />
                 </div>
                 <div>
                   <div className="text-xs font-bold text-amber-950 flex items-center gap-1.5">
                     <span>Expected Calving: {calvingAnimalName}</span>
-                    <span className="font-mono text-[10px] bg-amber-200/70 text-amber-900 px-1 rounded">
+                    <span className="font-mono text-[10px] bg-amber-200/70 text-amber-900 px-1 rounded font-bold">
                       {calvingAnimalTag}
                     </span>
                   </div>
@@ -228,17 +412,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           {/* Alert 2: Milk Withdrawal & Treatment Quarantine */}
           <div 
             onClick={() => onNavigate('vetBreeding')}
-            className="p-3.5 rounded-xl border border-rose-200/90 bg-rose-50/50 hover:bg-rose-50 transition-colors cursor-pointer group shadow-2xs"
+            className="p-3.5 rounded-xl border border-rose-200/90 bg-rose-50/60 hover:bg-rose-100/70 transition-colors cursor-pointer group shadow-2xs"
           >
             <div className="flex items-start justify-between gap-2">
               <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-rose-100 text-rose-900 shrink-0">
+                <div className="p-2 rounded-lg bg-rose-100 text-rose-900 shrink-0">
                   <ShieldAlert className="w-4 h-4 text-rose-800" />
                 </div>
                 <div>
                   <div className="text-xs font-bold text-rose-950 flex items-center gap-1.5">
                     <span>Milk Withdrawal: {quarantineAnimalName}</span>
-                    <span className="font-mono text-[10px] bg-rose-200/70 text-rose-900 px-1 rounded">
+                    <span className="font-mono text-[10px] bg-rose-200/70 text-rose-900 px-1 rounded font-bold">
                       {quarantineAnimalTag}
                     </span>
                   </div>
@@ -258,17 +442,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           {/* Alert 3: Low Inventory Stock */}
           <div 
             onClick={() => onNavigate('inventoryFeed')}
-            className="p-3.5 rounded-xl border border-purple-200/90 bg-purple-50/50 hover:bg-purple-50 transition-colors cursor-pointer group shadow-2xs"
+            className="p-3.5 rounded-xl border border-purple-200/90 bg-purple-50/60 hover:bg-purple-100/70 transition-colors cursor-pointer group shadow-2xs"
           >
             <div className="flex items-start justify-between gap-2">
               <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-purple-100 text-purple-900 shrink-0">
+                <div className="p-2 rounded-lg bg-purple-100 text-purple-900 shrink-0">
                   <Package className="w-4 h-4 text-purple-800" />
                 </div>
                 <div>
                   <div className="text-xs font-bold text-purple-950 flex items-center gap-1.5">
                     <span>Low Stock Alert</span>
-                    <span className="font-mono text-[10px] bg-purple-200/70 text-purple-900 px-1 rounded">
+                    <span className="font-mono text-[10px] bg-purple-200/70 text-purple-900 px-1 rounded font-bold">
                       {lowStockItems.length} items
                     </span>
                   </div>
@@ -288,17 +472,17 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           {/* Alert 4: Veterinary Follow-up Follow-ups */}
           <div 
             onClick={() => onNavigate('vetBreeding')}
-            className="p-3.5 rounded-xl border border-blue-200/90 bg-blue-50/50 hover:bg-blue-50 transition-colors cursor-pointer group shadow-2xs"
+            className="p-3.5 rounded-xl border border-blue-200/90 bg-blue-50/60 hover:bg-blue-100/70 transition-colors cursor-pointer group shadow-2xs"
           >
             <div className="flex items-start justify-between gap-2">
               <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-blue-100 text-blue-900 shrink-0">
+                <div className="p-2 rounded-lg bg-blue-100 text-blue-900 shrink-0">
                   <Syringe className="w-4 h-4 text-blue-800" />
                 </div>
                 <div>
                   <div className="text-xs font-bold text-blue-950 flex items-center gap-1.5">
                     <span>Vet Follow-up Scheduled</span>
-                    <span className="font-mono text-[10px] bg-blue-200/70 text-blue-900 px-1 rounded">
+                    <span className="font-mono text-[10px] bg-blue-200/70 text-blue-900 px-1 rounded font-bold">
                       {followUpAnimalTag}
                     </span>
                   </div>
@@ -318,11 +502,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           {/* Alert 5: Milk Stock Reconciliation */}
           <div 
             onClick={() => onNavigate('reconciliation')}
-            className="p-3.5 rounded-xl border border-emerald-200/90 bg-emerald-50/50 hover:bg-emerald-50 transition-colors cursor-pointer group shadow-2xs md:col-span-2"
+            className="p-3.5 rounded-xl border border-emerald-200/90 bg-emerald-50/60 hover:bg-emerald-100/70 transition-colors cursor-pointer group shadow-2xs md:col-span-2"
           >
             <div className="flex items-start justify-between gap-2">
               <div className="flex items-center gap-2">
-                <div className="p-1.5 rounded-lg bg-emerald-100 text-emerald-900 shrink-0">
+                <div className="p-2 rounded-lg bg-emerald-100 text-emerald-900 shrink-0">
                   <CheckCircle2 className="w-4 h-4 text-emerald-800" />
                 </div>
                 <div>
@@ -348,11 +532,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
       </div>
 
-      {/* 3. The 8 Operational KPI Cards Grid */}
+      {/* 4. The 8 Operational KPI Cards Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
         
-        {/* KPI 1: Today's Milk Production */}
-        <div className="bg-white rounded-xl p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all">
+        {/* KPI 1: Today's Milk Yield */}
+        <div className="bg-white rounded-2xl p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all">
           <div className="flex items-center justify-between text-xs text-[#64748B] mb-2">
             <span className="font-semibold text-neutral-700">Today's Milk Yield</span>
             <div className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700">
@@ -360,7 +544,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-[#172033] font-mono tracking-tight">
+            <span className="text-2xl font-black text-[#172033] font-mono tracking-tight tabular-nums">
               {totalDailyLitres.toFixed(1)}
             </span>
             <span className="text-xs font-semibold text-neutral-500">Litres</span>
@@ -368,23 +552,23 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               <ArrowUpRight className="w-3 h-3 mr-0.5" /> +6.4%
             </span>
           </div>
-          <div className="mt-2.5 pt-2 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-600 font-mono">
+          <div className="mt-2.5 pt-2 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-600 font-mono tabular-nums">
             <span>Morn: <strong>{morningLitres.toFixed(1)}L</strong></span>
             <span>Eve: <strong>{eveningLitres.toFixed(1)}L</strong></span>
             <span>Fat: <strong className="text-emerald-800">{avgFat}%</strong></span>
           </div>
         </div>
 
-        {/* KPI 2: Morning & Evening Shift Collection */}
-        <div className="bg-white rounded-xl p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all">
+        {/* KPI 2: Shift Yield Breakdown */}
+        <div className="bg-white rounded-2xl p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all">
           <div className="flex items-center justify-between text-xs text-[#64748B] mb-2">
-            <span className="font-semibold text-neutral-700">Shift Collection Breakdown</span>
+            <span className="font-semibold text-neutral-700">Shift Yield Breakdown</span>
             <div className="p-1.5 rounded-lg bg-blue-50 text-blue-700">
               <Scale className="w-4 h-4" />
             </div>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-xl font-black text-[#172033] font-mono tracking-tight">
+            <span className="text-xl font-black text-[#172033] font-mono tracking-tight tabular-nums">
               {morningLitres.toFixed(1)}L <span className="text-xs font-normal text-neutral-400">/</span> {eveningLitres.toFixed(1)}L
             </span>
             <span className="ml-auto text-[10px] font-bold text-blue-700 bg-blue-50 px-1.5 py-0.5 rounded">
@@ -392,13 +576,13 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </span>
           </div>
           <div className="mt-2.5 pt-2 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-600 font-mono">
-            <span>Chiller A: <strong>Okara</strong></span>
-            <span>Chiller B: <strong>Buffalo</strong></span>
+            <span>SNF: <strong className="text-blue-800 font-mono">{avgSnf}%</strong></span>
+            <span>Chiller: <strong className="text-neutral-900">3.8°C</strong></span>
           </div>
         </div>
 
-        {/* KPI 3: Today's Sales & Collected Payments */}
-        <div className="bg-white rounded-xl p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all">
+        {/* KPI 3: Sales & Cash Inflow */}
+        <div className="bg-white rounded-2xl p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all">
           <div className="flex items-center justify-between text-xs text-[#64748B] mb-2">
             <span className="font-semibold text-neutral-700">Sales & Cash Inflow</span>
             <div className="p-1.5 rounded-lg bg-teal-50 text-teal-700">
@@ -406,21 +590,21 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-[#172033] font-mono tracking-tight">
+            <span className="text-2xl font-black text-[#172033] font-mono tracking-tight tabular-nums">
               ₨ {totalSalesRevenue.toLocaleString()}
             </span>
             <span className="ml-auto flex items-center text-[11px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded">
               <ArrowUpRight className="w-3 h-3 mr-0.5" /> +12.1%
             </span>
           </div>
-          <div className="mt-2.5 pt-2 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-600 font-mono">
+          <div className="mt-2.5 pt-2 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-600 font-mono tabular-nums">
             <span>Cash: <strong className="text-emerald-700 font-semibold">₨ {totalCashCollected.toLocaleString()}</strong></span>
             <span>Credit: <strong className="text-amber-700">₨ {totalCreditSales.toLocaleString()}</strong></span>
           </div>
         </div>
 
-        {/* KPI 4: Total Animals & In-Milk Count */}
-        <div className="bg-white rounded-xl p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all">
+        {/* KPI 4: Herd & Milking Ratio */}
+        <div className="bg-white rounded-2xl p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all">
           <div className="flex items-center justify-between text-xs text-[#64748B] mb-2">
             <span className="font-semibold text-neutral-700">Herd & Milking Heads</span>
             <div className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700">
@@ -428,23 +612,23 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-[#172033] font-mono tracking-tight">
+            <span className="text-2xl font-black text-[#172033] font-mono tracking-tight tabular-nums">
               {totalAnimals}
             </span>
             <span className="text-xs font-semibold text-neutral-500">Heads</span>
-            <span className="ml-auto text-[11px] font-bold text-[#14532D] bg-[#14532D]/10 px-2 py-0.5 rounded">
+            <span className="ml-auto text-[11px] font-bold text-[#14532D] bg-[#14532D]/10 px-2 py-0.5 rounded font-mono">
               {milkingAnimals} in Milk
             </span>
           </div>
-          <div className="mt-2.5 pt-2 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-600 font-mono">
-            <span>Milking: <strong>{milkingAnimals}</strong></span>
+          <div className="mt-2.5 pt-2 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-600 font-mono tabular-nums">
             <span>Dry: <strong>{dryAnimals}</strong></span>
             <span>Preg: <strong>{pregnantAnimals}</strong></span>
+            <span>Sick: <strong className="text-rose-700">{sickAnimals}</strong></span>
           </div>
         </div>
 
-        {/* KPI 5: Monthly Expenses OPEX */}
-        <div className="bg-white rounded-xl p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all">
+        {/* KPI 5: Monthly OPEX Expenses */}
+        <div className="bg-white rounded-2xl p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all">
           <div className="flex items-center justify-between text-xs text-[#64748B] mb-2">
             <span className="font-semibold text-neutral-700">Monthly Operating Expenses</span>
             <div className="p-1.5 rounded-lg bg-purple-50 text-purple-700">
@@ -452,21 +636,21 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-[#172033] font-mono tracking-tight">
+            <span className="text-2xl font-black text-[#172033] font-mono tracking-tight tabular-nums">
               ₨ {monthlyExpenses.toLocaleString()}
             </span>
             <span className="ml-auto text-[10px] font-bold text-purple-700 bg-purple-50 px-1.5 py-0.5 rounded">
               OPEX
             </span>
           </div>
-          <div className="mt-2.5 pt-2 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-600 font-mono">
+          <div className="mt-2.5 pt-2 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-600 font-mono tabular-nums">
             <span>Feed: <strong>₨ {feedCost.toLocaleString()}</strong></span>
             <span>Labor/Vet: <strong>₨ {(laborCost + vetCost).toLocaleString()}</strong></span>
           </div>
         </div>
 
-        {/* KPI 6: Estimated Profit or Loss */}
-        <div className="bg-white rounded-xl p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all">
+        {/* KPI 6: Estimated Net Operating Profit */}
+        <div className="bg-white rounded-2xl p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all">
           <div className="flex items-center justify-between text-xs text-[#64748B] mb-2">
             <span className="font-semibold text-neutral-700">Net Operating Profit</span>
             <div className="p-1.5 rounded-lg bg-emerald-50 text-emerald-700">
@@ -474,21 +658,21 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-emerald-950 font-mono tracking-tight">
+            <span className="text-2xl font-black text-emerald-950 font-mono tracking-tight tabular-nums">
               ₨ {netOperatingProfit.toLocaleString()}
             </span>
-            <span className="ml-auto text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded">
+            <span className="ml-auto text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded font-mono">
               {profitMarginPercent}% Margin
             </span>
           </div>
-          <div className="mt-2.5 pt-2 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-600 font-mono">
+          <div className="mt-2.5 pt-2 border-t border-neutral-100 flex items-center justify-between text-[11px] text-neutral-600 font-mono tabular-nums">
             <span>Gross: <strong>₨ {grossProfit.toLocaleString()}</strong></span>
             <span className="text-emerald-700 font-semibold">Ledger Audited</span>
           </div>
         </div>
 
-        {/* KPI 7: Pending Customer Receivables (Khata) */}
-        <div className="bg-white rounded-xl p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all">
+        {/* KPI 7: Pending Customer Khata Receivables */}
+        <div className="bg-white rounded-2xl p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all">
           <div className="flex items-center justify-between text-xs text-[#64748B] mb-2">
             <span className="font-semibold text-neutral-700">Pending Receivables (Khata)</span>
             <div className="p-1.5 rounded-lg bg-amber-50 text-amber-700">
@@ -496,7 +680,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-amber-950 font-mono tracking-tight">
+            <span className="text-2xl font-black text-amber-950 font-mono tracking-tight tabular-nums">
               ₨ {receivables.toLocaleString()}
             </span>
             <span className="ml-auto text-[10px] font-bold text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200">
@@ -515,7 +699,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
 
         {/* KPI 8: Low Stock Alerts */}
-        <div className="bg-white rounded-xl p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all">
+        <div className="bg-white rounded-2xl p-4 border border-neutral-200/90 shadow-2xs hover:shadow-xs transition-all">
           <div className="flex items-center justify-between text-xs text-[#64748B] mb-2">
             <span className="font-semibold text-neutral-700">Inventory Stock Status</span>
             <div className="p-1.5 rounded-lg bg-rose-50 text-rose-700">
@@ -523,7 +707,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-2xl font-black text-[#172033] font-mono tracking-tight">
+            <span className="text-2xl font-black text-[#172033] font-mono tracking-tight tabular-nums">
               {lowStockItems.length}
             </span>
             <span className="text-xs font-semibold text-neutral-500">Items Low</span>
@@ -544,14 +728,14 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
       </div>
 
-      {/* 4. Interactive Analytics & Visualizations Charts */}
+      {/* 5. Interactive Analytics & Visualizations Charts */}
       <DashboardAnalyticsCharts 
         db={db}
         selectedBranchId={selectedBranchId}
       />
 
-      {/* 5. Milk Allocation & Chiller Reconciliation Strip */}
-      <div className="p-4 sm:p-5 rounded-xl border border-neutral-200/90 bg-white shadow-xs">
+      {/* 6. Milk Allocation & Chiller Reconciliation Strip */}
+      <div className="p-4 sm:p-5 rounded-2xl border border-neutral-200/90 bg-white shadow-2xs">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-3">
           <div>
             <h2 className="text-sm font-bold text-[#172033] flex items-center gap-2">
@@ -564,7 +748,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="px-2 py-0.5 text-[10px] font-mono font-bold rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200">
+            <span className="px-2.5 py-0.5 text-[10px] font-mono font-bold rounded-md bg-emerald-50 text-emerald-800 border border-emerald-200">
               Variance: 0.0 L (Reconciled)
             </span>
             <button
@@ -579,39 +763,39 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         {/* Visual Allocation Progress Bar */}
         <div className="space-y-1.5">
           <div className="h-3 w-full bg-neutral-100 rounded-full overflow-hidden flex">
-            {/* Sales (63.7%) */}
+            {/* Sales */}
             <div 
               style={{ width: `${(reconciliation.soldLitres / (reconciliation.totalCollected || 1)) * 100}%` }}
-              className="h-full bg-emerald-600"
+              className="h-full bg-emerald-600 transition-all duration-300"
               title={`Direct Sales: ${reconciliation.soldLitres}L`}
             />
-            {/* Calf Rearing (10.3%) */}
+            {/* Calf Rearing */}
             <div 
               style={{ width: `${(reconciliation.calfFeedingLitres / (reconciliation.totalCollected || 1)) * 100}%` }}
-              className="h-full bg-blue-500"
+              className="h-full bg-blue-500 transition-all duration-300"
               title={`Calf Feeding: ${reconciliation.calfFeedingLitres}L`}
             />
-            {/* Processing/Ghee (17.2%) */}
+            {/* Processing/Ghee */}
             <div 
               style={{ width: `${(reconciliation.processingLitres / (reconciliation.totalCollected || 1)) * 100}%` }}
-              className="h-full bg-amber-500"
+              className="h-full bg-amber-500 transition-all duration-300"
               title={`Value Addition Processing: ${reconciliation.processingLitres}L`}
             />
-            {/* Staff / Household (5.2%) */}
+            {/* Staff / Household */}
             <div 
               style={{ width: `${(reconciliation.householdStaffLitres / (reconciliation.totalCollected || 1)) * 100}%` }}
-              className="h-full bg-purple-500"
+              className="h-full bg-purple-500 transition-all duration-300"
               title={`Staff / Household: ${reconciliation.householdStaffLitres}L`}
             />
-            {/* Chiller Reserve (3.6%) */}
+            {/* Chiller Reserve */}
             <div 
               style={{ width: `${(reconciliation.remainingInChiller / (reconciliation.totalCollected || 1)) * 100}%` }}
-              className="h-full bg-teal-500"
+              className="h-full bg-teal-500 transition-all duration-300"
               title={`Remaining in Chiller: ${reconciliation.remainingInChiller}L`}
             />
           </div>
 
-          <div className="flex flex-wrap items-center justify-between text-[11px] text-neutral-600 font-mono gap-y-1 pt-1">
+          <div className="flex flex-wrap items-center justify-between text-[11px] text-neutral-600 font-mono tabular-nums gap-y-1 pt-1">
             <span className="flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-600" />
               <span>POS Sales: <strong>{reconciliation.soldLitres}L</strong></span>
@@ -634,6 +818,114 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </span>
           </div>
         </div>
+      </div>
+
+      {/* 7. Live Activity Feed: Recent Milking & Sales Invoices */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        
+        {/* Recent Milk Collection Records */}
+        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-neutral-200/90 shadow-2xs">
+          <div className="flex items-center justify-between mb-3 pb-2 border-b border-neutral-100">
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 rounded-lg bg-emerald-50 text-emerald-800">
+                <Milk className="w-4 h-4" />
+              </div>
+              <h3 className="text-xs font-bold text-neutral-900 uppercase tracking-wider">
+                Recent Milking Collections
+              </h3>
+            </div>
+            <button
+              onClick={() => onNavigate('milkProduction')}
+              className="text-xs font-semibold text-emerald-800 hover:underline"
+            >
+              View All &rarr;
+            </button>
+          </div>
+
+          <div className="space-y-2">
+            {recentMilk.map((rec) => {
+              const animal = branchAnimals.find(a => a.id === rec.animalId);
+              return (
+                <div 
+                  key={rec.id}
+                  className="flex items-center justify-between p-2.5 rounded-xl bg-neutral-50/70 hover:bg-neutral-100/80 transition-colors text-xs"
+                >
+                  <div className="flex items-center gap-2.5 truncate">
+                    <span className="font-mono font-bold text-emerald-950 bg-emerald-100/70 px-1.5 py-0.5 rounded text-[11px]">
+                      {rec.shift === 'morning' ? 'Morn' : 'Eve'}
+                    </span>
+                    <div className="truncate">
+                      <div className="font-bold text-neutral-900 truncate">
+                        {animal?.name || 'Dairy Cow'} <span className="font-mono text-neutral-500 font-normal">({animal?.earTag || 'PK-Tag'})</span>
+                      </div>
+                      <div className="text-[10px] text-neutral-400 font-mono">
+                        Fat: {rec.fatPercentage}% &middot; SNF: {rec.snfPercentage}%
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-right shrink-0">
+                    <span className="font-mono font-extrabold text-sm text-[#14532D]">
+                      {rec.quantityLitres.toFixed(1)} L
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Recent POS Sales Invoices */}
+        <div className="bg-white rounded-2xl p-4 sm:p-5 border border-neutral-200/90 shadow-2xs">
+          <div className="flex items-center justify-between mb-3 pb-2 border-b border-neutral-100">
+            <div className="flex items-center gap-2">
+              <div className="p-1.5 rounded-lg bg-amber-50 text-amber-800">
+                <ShoppingBag className="w-4 h-4" />
+              </div>
+              <h3 className="text-xs font-bold text-neutral-900 uppercase tracking-wider">
+                Recent POS Sales Receipts
+              </h3>
+            </div>
+            <button
+              onClick={() => onNavigate('posBilling')}
+              className="text-xs font-semibold text-amber-800 hover:underline"
+            >
+              Open Register &rarr;
+            </button>
+          </div>
+
+          <div className="space-y-2">
+            {recentSales.map((sale) => (
+              <div 
+                key={sale.id}
+                className="flex items-center justify-between p-2.5 rounded-xl bg-neutral-50/70 hover:bg-neutral-100/80 transition-colors text-xs"
+              >
+                <div className="flex items-center gap-2.5 truncate">
+                  <span className={`font-mono font-bold px-1.5 py-0.5 rounded text-[10px] uppercase ${
+                    sale.paymentMethod === 'cash' 
+                      ? 'bg-emerald-100 text-emerald-800' 
+                      : 'bg-amber-100 text-amber-800'
+                  }`}>
+                    {sale.paymentMethod}
+                  </span>
+                  <div className="truncate">
+                    <div className="font-bold text-neutral-900 truncate">
+                      {sale.customerName}
+                    </div>
+                    <div className="text-[10px] text-neutral-400 font-mono">
+                      {sale.items.length} item(s) &middot; {sale.invoiceNumber}
+                    </div>
+                  </div>
+                </div>
+                <div className="text-right shrink-0">
+                  <span className="font-mono font-extrabold text-sm text-neutral-900">
+                    ₨ {sale.total.toLocaleString()}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
       </div>
 
     </div>

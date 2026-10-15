@@ -155,12 +155,12 @@ export const Sidebar: React.FC<SidebarProps> = ({
   const sidebarContent = (
     <div className="flex flex-col h-full bg-white border-r border-neutral-200/80 w-64 sm:w-72 select-none">
       
-      {/* Mobile Drawer Header */}
-      <div className="p-4 border-b border-neutral-100 flex items-center justify-between lg:hidden bg-[#14532D]/5">
-        <AskLogo variant="horizontal" size="xs" />
+      {/* Brand Header with Standardized ASK Logo (Visible on desktop & mobile) */}
+      <div className="p-4 border-b border-neutral-100 flex items-center justify-between bg-gradient-to-r from-[#14532D]/5 via-[#166534]/5 to-transparent">
+        <AskLogo variant="horizontal" size="sm" />
         <button
           onClick={onCloseMobile}
-          className="p-1.5 text-neutral-500 hover:text-neutral-900 rounded-lg hover:bg-neutral-100 transition-colors"
+          className="p-1.5 text-neutral-500 hover:text-neutral-900 rounded-lg hover:bg-neutral-100 transition-colors lg:hidden cursor-pointer"
           aria-label="Close sidebar"
         >
           <X className="w-5 h-5" />

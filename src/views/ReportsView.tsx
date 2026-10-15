@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { AppDatabase } from '../services/storage';
 import { Language, translations } from '../i18n/translations';
+import { AskLogo } from '../components/AskLogo';
 
 interface ReportsViewProps {
   db: AppDatabase;
@@ -225,6 +226,25 @@ export const ReportsView: React.FC<ReportsViewProps> = ({
             onChange={(e) => setEndDate(e.target.value)}
             className="p-1 border border-neutral-300 rounded text-xs"
           />
+        </div>
+      </div>
+
+      {/* Official Farm Letterhead for Reports & Print Layouts */}
+      <div className="bg-white p-4 rounded-xl border border-neutral-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+        <div className="flex items-center gap-3">
+          <AskLogo variant="mark" size="md" />
+          <div>
+            <h2 className="text-sm font-extrabold text-[#14532D] tracking-tight">
+              ASK DAIRY MANAGEMENT &middot; OFFICIAL REPORT
+            </h2>
+            <p className="text-[11px] text-neutral-500 font-mono">
+              Report Period: {startDate} to {endDate} &middot; Type: {reportType.toUpperCase()}
+            </p>
+          </div>
+        </div>
+        <div className="text-left sm:text-right text-[11px] text-neutral-400 font-mono">
+          <div>Verified Enterprise Audit</div>
+          <div>Printed: {new Date().toLocaleDateString()}</div>
         </div>
       </div>
 

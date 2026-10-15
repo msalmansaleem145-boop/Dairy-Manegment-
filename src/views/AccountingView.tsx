@@ -15,6 +15,7 @@ import {
 import { Account, JournalEntry, JournalLine } from '../types';
 import { AppDatabase, DairyDatabaseService } from '../services/storage';
 import { Language, translations } from '../i18n/translations';
+import { AskLogo } from '../components/AskLogo';
 
 interface AccountingViewProps {
   db: AppDatabase;
@@ -286,18 +287,24 @@ export const AccountingView: React.FC<AccountingViewProps> = ({
       {/* Tab 1: P&L Statement */}
       {activeTab === 'pnl' && (
         <div className="bg-white rounded-xl border border-neutral-200 p-6 space-y-5 shadow-xs max-w-4xl">
-          <div className="flex items-center justify-between border-b border-neutral-200 pb-3">
-            <div>
-              <h2 className="text-base font-bold text-neutral-900">Statement of Profit & Loss</h2>
-              <p className="text-xs text-neutral-500">For current operational period (All figures in PKR ₨)</p>
+          {/* Official Letterhead */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-neutral-200 pb-4">
+            <div className="flex items-center gap-3">
+              <AskLogo variant="mark" size="md" />
+              <div>
+                <h2 className="text-base font-extrabold text-[#14532D]">ASK DAIRY MANAGEMENT</h2>
+                <p className="text-xs text-neutral-500">Official Statement of Profit &amp; Loss &middot; Registered Punjab Livestock Board</p>
+              </div>
             </div>
-            <button
-              onClick={() => window.print()}
-              className="text-xs font-semibold text-emerald-800 hover:text-emerald-900 flex items-center gap-1 cursor-pointer"
-            >
-              <Printer className="w-3.5 h-3.5" />
-              <span>Print Statement</span>
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => window.print()}
+                className="text-xs font-semibold px-3 py-1.5 bg-[#14532D] text-white hover:bg-[#166534] rounded-lg flex items-center gap-1.5 cursor-pointer shadow-xs"
+              >
+                <Printer className="w-3.5 h-3.5" />
+                <span>Print Statement</span>
+              </button>
+            </div>
           </div>
 
           <div className="space-y-4 text-xs">

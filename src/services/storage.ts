@@ -29,7 +29,7 @@ const STORAGE_KEY = 'ask_dairy_database_v1';
 const OFFLINE_QUEUE_KEY = 'ask_dairy_offline_queue_v1';
 
 // Import local generated assets as bundled modules for GitHub Pages asset resolution
-import LOGO_URL from '../assets/images/ask_dairy_logo_1791785114471.jpg';
+import LOGO_URL from '../assets/images/ask_dairy_logo_1792059444506.jpg';
 import COW_URL from '../assets/images/sahiwal_cow_portrait_1791785128021.jpg';
 import FACILITY_URL from '../assets/images/dairy_milk_processing_1791785144617.jpg';
 
