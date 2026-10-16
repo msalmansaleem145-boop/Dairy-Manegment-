@@ -3,9 +3,15 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 import {defineConfig} from 'vite';
 
-export default defineConfig(() => {
+export default defineConfig(({ command }) => {
+  // In development, serve from root '/'.
+  // In production, use VITE_BASE_PATH if provided, or default to './' for universal relative asset loading.
+  const basePath = command === 'serve' 
+    ? '/' 
+    : (process.env.VITE_BASE_PATH || './');
+
   return {
-    base: process.env.VITE_BASE_PATH || '/Dairy-Manegment/',
+    base: basePath,
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {

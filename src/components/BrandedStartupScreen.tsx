@@ -16,6 +16,8 @@ export const BrandedStartupScreen: React.FC<BrandedStartupScreenProps> = ({
   const [isFadingOut, setIsFadingOut] = useState(false);
 
   useEffect(() => {
+    let dismissTimer: ReturnType<typeof setTimeout> | null = null;
+
     // Step progression sequence for immersive branded initialization
     const timer1 = setTimeout(() => {
       setProgress(45);
@@ -34,17 +36,23 @@ export const BrandedStartupScreen: React.FC<BrandedStartupScreenProps> = ({
 
     const timerComplete = setTimeout(() => {
       setIsFadingOut(true);
-      const dismissTimer = setTimeout(() => {
+      dismissTimer = setTimeout(() => {
         onComplete();
       }, 500); // Wait for fade-out transition
-      return () => clearTimeout(dismissTimer);
     }, minDurationMs);
+
+    // Hard safety timeout: guaranteed dismissal after 3.5s max even if low-power mode pauses timers
+    const safetyTimer = setTimeout(() => {
+      onComplete();
+    }, Math.max(minDurationMs + 1000, 3200));
 
     return () => {
       clearTimeout(timer1);
       clearTimeout(timer2);
       clearTimeout(timer3);
       clearTimeout(timerComplete);
+      clearTimeout(safetyTimer);
+      if (dismissTimer) clearTimeout(dismissTimer);
     };
   }, [minDurationMs, onComplete]);
 

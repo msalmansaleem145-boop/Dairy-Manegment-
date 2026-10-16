@@ -1229,8 +1229,34 @@ export class DairyDatabaseService {
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
-        this.cachedDb = JSON.parse(stored);
-        return this.cachedDb!;
+        const parsed = JSON.parse(stored);
+        if (parsed && typeof parsed === 'object') {
+          this.cachedDb = {
+            branches: Array.isArray(parsed.branches) && parsed.branches.length > 0 ? parsed.branches : defaultBranches,
+            animals: Array.isArray(parsed.animals) ? parsed.animals : defaultAnimals,
+            milkRecords: Array.isArray(parsed.milkRecords) ? parsed.milkRecords : generateInitialMilkRecords(),
+            milkReconciliations: Array.isArray(parsed.milkReconciliations) ? parsed.milkReconciliations : [defaultReconciliation],
+            customers: Array.isArray(parsed.customers) ? parsed.customers : defaultCustomers,
+            customerLedgers: Array.isArray(parsed.customerLedgers) ? parsed.customerLedgers : defaultCustomerLedgers,
+            products: Array.isArray(parsed.products) ? parsed.products : defaultProducts,
+            productBatches: Array.isArray(parsed.productBatches) ? parsed.productBatches : defaultBatches,
+            sales: Array.isArray(parsed.sales) ? parsed.sales : defaultSales,
+            suppliers: Array.isArray(parsed.suppliers) ? parsed.suppliers : defaultSuppliers,
+            inventory: Array.isArray(parsed.inventory) ? parsed.inventory : defaultInventory,
+            inventoryMovements: Array.isArray(parsed.inventoryMovements) ? parsed.inventoryMovements : [],
+            feedPlans: Array.isArray(parsed.feedPlans) ? parsed.feedPlans : defaultFeedPlans,
+            feedConsumptions: Array.isArray(parsed.feedConsumptions) ? parsed.feedConsumptions : defaultFeedConsumptions,
+            vetRecords: Array.isArray(parsed.vetRecords) ? parsed.vetRecords : defaultVetRecords,
+            breedingRecords: Array.isArray(parsed.breedingRecords) ? parsed.breedingRecords : defaultBreedingRecords,
+            employees: Array.isArray(parsed.employees) ? parsed.employees : defaultEmployees,
+            payroll: Array.isArray(parsed.payroll) ? parsed.payroll : defaultPayroll,
+            accounts: Array.isArray(parsed.accounts) ? parsed.accounts : defaultAccounts,
+            journalEntries: Array.isArray(parsed.journalEntries) ? parsed.journalEntries : defaultJournalEntries,
+            notifications: Array.isArray(parsed.notifications) ? parsed.notifications : defaultNotifications,
+            shiftClosings: Array.isArray(parsed.shiftClosings) ? parsed.shiftClosings : defaultShiftClosings
+          };
+          return this.cachedDb;
+        }
       }
     } catch (e) {
       console.error('Failed to load database from localStorage, initializing defaults', e);
